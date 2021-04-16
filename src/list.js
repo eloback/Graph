@@ -81,13 +81,31 @@ class LinkedList {
     }
     return false;
   }
-  searchVertice(value) {
+  searchVertice(value) { /// Search in links
     let node = this.head;
     while (node) {
       if (value === node.data.value) return node.data;
       node = node.next;
     }
     return false;
+  }
+  getByValue(value){ // Search in Lists
+    let node = this.head;
+    while (node) {
+      if(node.linkValue === value) return node;
+      node = node.next;
+    }
+    return false;
+  }
+  getMinLink(explored){
+    let node = this.head;
+    let min;
+    while (node) {
+      if(!(min) && !explored.contains(node.linkValue)) min = node
+      else if(node.linkValue < min && !explored.contains(node.linkValue)) min = node;
+      node = node.next;
+    }
+    return min;
   }
 }
 

@@ -31,64 +31,34 @@ function printGrafo(grafo) {
   return return_string;
 }
 
-/* function PRIM(grafo){
-  let Gsize = grafo.size();
-  const MST = new LinkedList();
-   if (Gsize === 0) {
-      return MST;
-   }
-
-
-   // Select first node as starting node
-   let s = grafo.getFirst()
-
-
-   // Create a Priority Queue and explored set
-   let edgeQueue = new PriorityQueue(Gsize * Gsize);
-   let explored = new Set();
-   explored.add(s);
-   MST.push(s);
-
-
-   // Add all edges from this starting node to the PQ taking weights as priority
-  let node = grafo.getFirst().data.links.getFirst();
-  while (node) {
-    edgeQueue.push([s, node.data], node.linkValue);
-    node = node.next;
+function PRIM(grafo) {
+  let size = grafo.size();
+  const MST = [];
+  if (size === 0) {
+    return MST;
   }
-
-
-   // Take the smallest edge and add that to the new graph
-   let currentMinEdge = edgeQueue.dequeue();
-   while (!edgeQueue.isEmpty()) {
-
-
-      // COntinue removing edges till we get an edge with an unexplored node
-      while (!edgeQueue.isEmpty() && explored.has(currentMinEdge.data[1])) {
-         currentMinEdge = edgeQueue.dequeue();
-      }
-      let nextNode = currentMinEdge.data[1];
-
-
-      // Check again as queue might get empty without giving back unexplored element
-      if (!explored.has(nextNode)) {
-         MST.addNode(nextNode);
-         MST.addEdge(currentMinEdge.data[0], nextNode, currentMinEdge.priority);
-         // Again add all edges to the PQ
-         this.edges[nextNode].forEach(edge => {
-            edgeQueue.enqueue([nextNode, edge.node], edge.weight);
-         });
-
-
-         // Mark this node as explored explored.add(nextNode);
-         s = nextNode;
-      }
-   }
-   return MST;
-} */
-
+  let nodeAtual = grafo.getFirst();
+  let explored = [];
+  explored.push(nodeAtual);
+  MST.push(nodeAtual);
+  // Take the smallest edge and add that to the new graph
+  while (grafo.size() != MST.length) {
+    if (nodeAtual.links.getMinLink(explored)) {
+      console.log(nodeAtual);
+      let minValue = grafo.searchVertice(nodeAtual.links.getMinLink(explored));
+      explored.push(minValue);
+      MST.push(minValue);
+      nodeAtual = minValue;
+    }else{
+      nodeAual = MST[MST.length-2]
+    }
+  }
+  console.log(MST);
+  return MST;
+}
 
 const app = express();
+app.use(express.static("public"));
 //app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -131,16 +101,14 @@ app.post("/api/insert", (req, res) => {
   if (Ve.value != "" && Ve2.value != "") {
     ////////////////  se nenhum dos vertices é vazio cria uma aresta/arco
     if (valorado != "true") {
-      console.log("not Valorado")
       if (tipo == "true") Ve.adicionarArco(Ve2);
       else Ve.adicionarAresta(Ve2);
-    }else{
-      console.log("Valorado")
+    } else {
       if (tipo == "true") Ve.adicionarArco(Ve2, value);
       else Ve.adicionarAresta(Ve2, value);
     }
   }
-  console.log(Ve)
+  console.log(Ve);
   if (!usingOrigin && Ve.value != "") Grafo.push(Ve); ////  se não existe e não é vazio adiciona no array
   if (!usingTarget && Ve2.value != "") Grafo.push(Ve2);
 
@@ -183,6 +151,10 @@ app.post("/api/remove", (req, res) => {
     }
   }
   res.redirect("/");
+});
+
+app.get("/api/prim", (req, res) => {
+  res.send(PRIM(Grafo));
 });
 
 app.get("/api/reset", (req, res) => {
