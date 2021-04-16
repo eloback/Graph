@@ -2,6 +2,8 @@ const express = require("express");
 var bodyParser = require("body-parser");
 var path = require("path");
 
+const PORT = process.env.PORT || 3000;
+
 const { ListNode, LinkedList, Vertice } = require("./list");
 /*  Como Criar um Grafo
   let A = new Vertice('A', new LinkedList())
@@ -28,6 +30,63 @@ function printGrafo(grafo) {
   }
   return return_string;
 }
+
+/* function PRIM(grafo){
+  let Gsize = grafo.size();
+  const MST = new LinkedList();
+   if (Gsize === 0) {
+      return MST;
+   }
+
+
+   // Select first node as starting node
+   let s = grafo.getFirst()
+
+
+   // Create a Priority Queue and explored set
+   let edgeQueue = new PriorityQueue(Gsize * Gsize);
+   let explored = new Set();
+   explored.add(s);
+   MST.push(s);
+
+
+   // Add all edges from this starting node to the PQ taking weights as priority
+  let node = grafo.getFirst().data.links.getFirst();
+  while (node) {
+    edgeQueue.push([s, node.data], node.linkValue);
+    node = node.next;
+  }
+
+
+   // Take the smallest edge and add that to the new graph
+   let currentMinEdge = edgeQueue.dequeue();
+   while (!edgeQueue.isEmpty()) {
+
+
+      // COntinue removing edges till we get an edge with an unexplored node
+      while (!edgeQueue.isEmpty() && explored.has(currentMinEdge.data[1])) {
+         currentMinEdge = edgeQueue.dequeue();
+      }
+      let nextNode = currentMinEdge.data[1];
+
+
+      // Check again as queue might get empty without giving back unexplored element
+      if (!explored.has(nextNode)) {
+         MST.addNode(nextNode);
+         MST.addEdge(currentMinEdge.data[0], nextNode, currentMinEdge.priority);
+         // Again add all edges to the PQ
+         this.edges[nextNode].forEach(edge => {
+            edgeQueue.enqueue([nextNode, edge.node], edge.weight);
+         });
+
+
+         // Mark this node as explored explored.add(nextNode);
+         s = nextNode;
+      }
+   }
+   return MST;
+} */
+
 
 const app = express();
 //app.set("view engine", "ejs");
@@ -131,6 +190,6 @@ app.get("/api/reset", (req, res) => {
   res.redirect("/");
 });
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
   console.log("Listening in port 3000");
 });
