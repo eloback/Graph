@@ -22,29 +22,40 @@
         <h2 id="grafo"></h2>
     </div>
     <button onClick="reset()" style="margin-right:10px; margin-bottom:2%" id="reset">Resetar Grafo</button>
-    
+
     <nav aria-label="...">
         <ul class="pagination pagination-lg">
             <li id="li-insert" class="page-item active"><a id="insert" class="page-link">Insert</a></li>
-            <li id="li-delete"  class="page-item"><a id="delete" class="page-link">Delete</a></li>
+            <li id="li-delete" class="page-item"><a id="delete" class="page-link">Delete</a></li>
         </ul>
     </nav>
-    <div id="delete-div" class="invisible d-inline-flex p-2 ">
-        <input onClick="changeDeleteType()" style="margin-left: 70%; margin-right:5px;" type="checkbox" id="delete-type" name="delete-type" checked="" />
-        <label for="delete-type">Vertice</label>
+    <div class="d-inline-flex p-2">
+        <input onClick="changeType()" style="margin-left: 60px; margin-right:5px;" type="checkbox" id="type" name="type"
+            checked="" />
+        <label id="type-text" for="type">Valorado</label>
     </div>
     <div>
-    <label for="Oname">Origem</label><br />
-    <input type="text" id="Oname" name="Oname" /><br />
-    <div id="dest-input"><label for="Dname">Destino:</label><br />
-    <input type="text" id="Dname" name="Dname" /></div>
+        <table>
+            <tr>
+                <th scope="col"><label for="Oname">Origem:</label></th>
+                <td><input type="text" id="Oname" name="Oname" /></td>
+            </tr>
+            <tr id="dest-input">
+                <th scope="col"><label for="Dname">Destino:</label></th>
+                <td><input type="text" id="Dname" name="Dname" /></td>
+            </tr>
+            <tr id="value-div">
+                <th scope="col"><label for="value">Valor:</label></th>
+                <td><input type="text" id="value" name="value" /></td>
+            </tr>
+        </table>
     </div><br><br>
 
     <div class="buttons" style="display: flex;align-items:center">
         <button style="margin-right:10px;" id="enviar">Enviar</button>
         <div id="tipo-div">
-        <input style="margin-right:5px;" type="checkbox" id="tipo" name="tipo" checked="" />
-        <label for="tipo">Arco(default: Aresta)</label>
+            <input style="margin-right:5px;" type="checkbox" id="tipo" name="tipo" checked="" />
+            <label for="tipo">Arco(default: Aresta)</label>
         </div>
     </div>
 
@@ -66,7 +77,10 @@
             var data = {};
             data.Oname = document.getElementById('Oname').value;
             data.Dname = document.getElementById('Dname').value;
+            data.value = document.getElementById('value').value;
             data.tipo = document.getElementById('tipo').checked;
+            data.valorado = document.getElementById('type').checked;
+            console.log(data)
             $.ajax({
                 type: 'POST',
                 url: '/api/insert',
@@ -84,8 +98,8 @@
             data.Oname = document.getElementById('Oname').value;
             data.Dname = document.getElementById('Dname').value;
             data.tipo = document.getElementById('tipo').checked;
-            data.delete_type = document.getElementById('delete-type').checked;
-            console.log(data)
+            data.delete_type = document.getElementById('type').checked;
+
             $.ajax({
                 type: 'POST',
                 url: '/api/remove',
@@ -98,7 +112,7 @@
             });
         }
 
-        function reset(){
+        function reset() {
             var data = {};
             $.ajax({
                 type: 'get',
@@ -111,38 +125,47 @@
             });
         }
 
-        function changeDeleteType() {
-            if($("#delete-type").prop("checked")){
-                $("#dest-input").addClass("invisible");
-                $("#Dname").val("");
-                $("#tipo-div").addClass("invisible");
-            }else{
-                $("#dest-input").removeClass("invisible");
-                $("#tipo-div").removeClass("invisible");
+        function changeType() {
+            $("#tipo-div").removeClass("invisible");
+            $("#dest-input").removeClass("invisible");
+            $("#value").val("");
+            if ($("#li-insert").hasClass("active")) {
+                $("#type-text").text("Valorado");
+                if (!$("#type").prop("checked")) $("[id=value-div]").addClass("invisible");
+                else $("[id=value-div]").removeClass("invisible");
+            } else {
+                $("#value-div").addClass("invisible");
+                if ($("#type").prop("checked")) {
+                    $("#tipo-div").addClass("invisible");
+                    $("#dest-input").addClass("invisible");
+                    $("#Dname").val("");
+                }
+                $("#type-text").text("Vertice");
+
             }
+            //console.log($("#value-div").hasClass("invisible"))
         }
 
         window.addEventListener('DOMContentLoaded', function () {
             $("#tipo").prop("checked", false);
-            $("#delete-type").prop("checked", false);
+            $("#type").prop("checked", false);
+            changeType()
             $("#enviar").on("click", insertVertice);
             getGrafo();
         })
         $("#insert").on("click", function () {
-            $("#delete-type").prop("checked", false);
-            changeDeleteType();
-            $("#li-delete").removeClass("active");
             $("#li-insert").addClass("active");
+            changeType();
             event.preventDefault();
-            $("#delete-div").addClass("invisible");
+            $("#li-delete").removeClass("active");
             $('#enviar').unbind('click');
             $("#enviar").attr("onclick", "insertVertice()");
         })
         $("#delete").on("click", function () {
-            event.preventDefault();
             $("#li-insert").removeClass("active");
+            changeType();
+            event.preventDefault();
             $("#li-delete").addClass("active");
-            $("#delete-div").removeClass("invisible");
             $('#enviar').unbind('click');
             $("#enviar").attr("onclick", "deleteVertice()");
         })

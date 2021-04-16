@@ -1,6 +1,7 @@
 class ListNode {
-  constructor(data) {
+  constructor(data , value = null) {
     this.data = data;
+    this.linkValue = value;
     this.next = null;
   }
 }
@@ -105,6 +106,15 @@ class Vertice {
       this.links.head = new ListNode(vertice);
     }
   }
+  adicionarArco(vertice, value) {
+    if (this.links.head)
+      if (!this.links.searchNode(vertice))
+        this.links.getLast().next = new ListNode(vertice, value);
+      else this.links.head = new ListNode(vertice, value);
+    else{
+      this.links.head = new ListNode(vertice, value);
+    }
+  }
   adicionarAresta(vertice) {
     if (this.links.head) {
       if (!this.links.searchNode(vertice)) {
@@ -116,6 +126,17 @@ class Vertice {
       vertice.adicionarAresta(this);
     }
   }
+  adicionarAresta(vertice, value) {
+    if (this.links.head) {
+      if (!this.links.searchNode(vertice)) {
+        this.links.getLast().next = new ListNode(vertice, value);
+        vertice.adicionarAresta(this, value);
+      }
+    } else {
+      this.links.head = new ListNode(vertice, value);
+      vertice.adicionarAresta(this, value);
+    }
+  }
 
   print(){
     let return_string = "";
@@ -123,6 +144,19 @@ class Vertice {
     if (lastNode) {
       while (lastNode) {
         return_string += this.value+lastNode.data.value+", ";
+        lastNode = lastNode.next;
+      }
+    }
+    return return_string;
+  }
+
+  printValue(){
+    let return_string = "";
+    let lastNode = this.links.head;
+    if (lastNode) {
+      while (lastNode) {
+        if(lastNode.linkValue)return_string += "("+this.value+","+lastNode.data.value+")["+lastNode.linkValue+"], ";
+        else return_string += "("+this.value+lastNode.data.value+"), ";
         lastNode = lastNode.next;
       }
     }
