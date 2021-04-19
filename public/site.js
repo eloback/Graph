@@ -165,21 +165,23 @@ function calcular() {
     type: "post",
     url: "/api/calcular",
     data: data,
-    success: function (data) {
+    success: function (result) {
       var c = document.getElementById("algoritimo-canvas");
       var ctx = c.getContext("2d");
       let visitados = [];
       let layer = 0;
-      data.map((links) => {
-        return (
-          "<p style='width:100px'>(" +
-          links.link[0] +
-          links.link[1] +
-          ")[" +
-          links.link_value +
-          "]</p>"
-        );
-        if (!visitados) {
+      if (result.algoritimo == "PRIM") {
+        $(".table-result").html( result.data.map((vertices) => {
+            return ("<p style='width:100px'>(" +
+              vertices.link[0] +
+              vertices.link[1] +
+              ")[" +
+              vertices.link_value +
+              "]</p>");
+          
+        }));
+      } else if (result.algoritimo == "BFS") $(".table-result").html(result.data);
+      /* if (!visitados) {
           visitados.push({ value: links.link[0], layer: layer });
         } else if (visitados.find((vertice) => vertice.value == link[0])) {
         }
@@ -192,8 +194,8 @@ function calcular() {
         ctx.stroke();
         ctx.font = "15px Arial";
         ctx.strokeText(vertice.value, vertice.x - 5, vertice.y + 5);
-        layer++;
-      });
+        layer++; */
+        
       /* draw_line2(
         vertice.x,
         vertice.y,
@@ -259,6 +261,5 @@ $("#delete").on("click", function () {
 function algoritimoChange() {
   $("#algoritimo").prop("size", 1);
   let newAlgo = $("#algoritimo").prop("value");
-  console.log(newAlgo);
   $("#calcular").text("Calcular " + newAlgo);
 }
