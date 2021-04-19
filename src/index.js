@@ -4,56 +4,55 @@ var path = require("path");
 
 const PORT = process.env.PORT || 3000;
 
-const { ListNode, LinkedList, Vertice } = require("./list");
-/*  Como Criar um Grafo
-  let A = new Vertice('A', new LinkedList())
-  let B = new Vertice('B', new LinkedList())
-  let C = new Vertice('C', new LinkedList())
-  let D = new Vertice('D', new LinkedList())
+const { ListNode, LinkedList, Vertice, Queue } = require("./list");
 
-  A.adicionarArco(B)
-  A.adicionarArco(C)
-  B.adicionarArco(C)
-  D.adicionarArco(C)
+/// Como Criar um Grafo
+let A = new Vertice("A", new LinkedList());
+let B = new Vertice("B", new LinkedList());
+let C = new Vertice("C", new LinkedList());
+let D = new Vertice("D", new LinkedList());
+let F = new Vertice("F", new LinkedList());
 
-  let graph = [A, B, C, D] */
-var Grafo = new LinkedList();
+A.adicionarAresta(B, 3);
 
-function printGrafo(grafo) {
+B.adicionarAresta(C, 7);
+C.adicionarAresta(D, 6);
+D.adicionarAresta(B, 2);
+D.adicionarAresta(F, 10);
+F.adicionarAresta(A, 5);
+let Grafo = [A, B, C, D, F]
+
+/* var Grafo = []; */
+
+
+function printGrafo() {
   let return_string = "";
-  let lastNode = Grafo.head;
-  if (lastNode) {
-    while (lastNode) {
-      return_string += lastNode.data.printValue();
-      lastNode = lastNode.next;
-    }
-  }
+  Grafo.map(aresta=>{
+    return_string+= aresta.printValue()
+  })
   return return_string;
 }
 
-function PRIM(grafo) {
-  let size = grafo.size();
+function PRIM() {
+  let size = Grafo.length;
   const MST = [];
   if (size === 0) {
     return MST;
   }
-  let nodeAtual = grafo.getFirst();
+  let nodeAtual = Grafo[0];
+  let queue = new Queue;
   let explored = [];
-  explored.push(nodeAtual);
-  MST.push(nodeAtual);
   // Take the smallest edge and add that to the new graph
-  while (grafo.size() != MST.length) {
-    if (nodeAtual.links.getMinLink(explored)) {
-      console.log(nodeAtual);
-      let minValue = grafo.searchVertice(nodeAtual.links.getMinLink(explored));
-      explored.push(minValue);
-      MST.push(minValue);
-      nodeAtual = minValue;
-    }else{
-      nodeAual = MST[MST.length-2]
+  while (size-1 != MST.length || !nodeAtual) {
+    queue.fillQueue(nodeAtual);
+    explored.push(nodeAtual);
+    let minValue = queue.getMin(explored);
+    if (minValue) {
+      MST.push({'link':[minValue.Origem.value, minValue.Destino.value], 'link_value':minValue.Link_Value});
+      nodeAtual = minValue.Destino;
     }
   }
-  console.log(MST);
+  //console.log(MST);
   return MST;
 }
 
@@ -67,7 +66,11 @@ app.get("/", (req, res) => {
 });
 
 app.get("/api/get", (req, res) => {
-  res.send([printGrafo(Grafo), Grafo.view()]);
+  res.send([Grafo.map(vertice=>{
+    return {'value':vertice.value, 'x':vertice.x, 'y':vertice.y, 'links':vertice.getLinks()}
+  }), Grafo.map(vertice=>{
+    return {'value':vertice.value, 'x':vertice.x, 'y':vertice.y}
+  })]);
 });
 
 app.post("/api/insert", (req, res) => {
@@ -77,7 +80,7 @@ app.post("/api/insert", (req, res) => {
   // body parser do request
   const originName = req.body.Oname;
   const targetName = req.body.Dname;
-  const value = req.body.value;
+  const value = Number(req.body.value);
   const tipo = req.body.tipo;
   const valorado = req.body.valorado;
   // declara Vertices
@@ -85,8 +88,8 @@ app.post("/api/insert", (req, res) => {
   let Ve2 = new Vertice(targetName, new LinkedList());
   if (Grafo) {
     //////////////////////////////////  Verifica se vertice já existe no array
-    let VeP = Grafo.searchVertice(Ve.value);
-    let Ve2P = Grafo.searchVertice(Ve2.value);
+    let VeP = Grafo.find((aresta)=>aresta.value == Ve.value);
+    let Ve2P = Grafo.find((aresta)=>aresta.value == Ve2.value);
     if (VeP) {
       usingOrigin = true;
       Ve = VeP;
@@ -96,7 +99,6 @@ app.post("/api/insert", (req, res) => {
       Ve2 = Ve2P;
     }
   }
-
   //criação das arestas arcos e inserção no Grafo
   if (Ve.value != "" && Ve2.value != "") {
     ////////////////  se nenhum dos vertices é vazio cria uma aresta/arco
@@ -108,7 +110,6 @@ app.post("/api/insert", (req, res) => {
       else Ve.adicionarAresta(Ve2, value);
     }
   }
-  console.log(Ve);
   if (!usingOrigin && Ve.value != "") Grafo.push(Ve); ////  se não existe e não é vazio adiciona no array
   if (!usingTarget && Ve2.value != "") Grafo.push(Ve2);
 
@@ -129,18 +130,14 @@ app.post("/api/remove", (req, res) => {
   const targetName = req.body.Dname;
   const tipo = req.body.tipo;
   const removeVertice = req.body.delete_type; // Aresta/arco ou vertice
-  let Ve = Grafo.searchVertice(originName);
+  let Ve = Grafo.find((aresta)=>aresta.value == originName);
   if (removeVertice) {
     if (Ve) {
-      let node = Grafo.getFirst();
-      while (node) {
-        node.data.links.delete(Ve.value);
-        node = node.next;
-      }
-      Grafo.delete(Ve.value);
+      Grafo.map((aresta)=>aresta.links.delete(Ve.value))
+      Grafo = Grafo.filter((aresta)=>aresta!==Ve);
     }
   } else {
-    let Ve2 = Grafo.searchVertice(targetName);
+    let Ve2 = Grafo.find((aresta)=>aresta.value == targetName);
     if (Ve2) {
       if (tipo) {
         Ve.links.delete(Ve2.value);
@@ -153,12 +150,20 @@ app.post("/api/remove", (req, res) => {
   res.redirect("/");
 });
 
-app.get("/api/prim", (req, res) => {
-  res.send(PRIM(Grafo));
+app.get("/api/calcular/:algo", (req, res) => {
+  switch(req.params.algo){
+    case 'PRIM':
+      res.send(PRIM(Grafo));
+      break;
+    case 'BFS':
+      break;
+    default:
+      res.send();
+  }
 });
 
 app.get("/api/reset", (req, res) => {
-  Grafo = new LinkedList();
+  Grafo = [];
   res.redirect("/");
 });
 

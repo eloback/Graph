@@ -12,176 +12,80 @@
 
 </head>
 
-<body style="margin-left: 10%;">
+<body>
     <table>
-        <td>
-            <div class="vertices" style="display: flex;align-items:center">
-                <h1 style="padding-right: 2%;">Vertices: </h1>
+        <tr>
+            <div class="vertices">
+                <h1>Vertices: </h1>
                 <h2 id="vertices"></h2>
             </div>
-            <div class="grafos" style="display: flex;align-items:center;margin-bottom: 2%;">
-                <h1 style="padding-right: 2%;">Grafo: </h1>
+            <div class="grafos">
+                <h1 >Grafo: </h1>
                 <h2 id="grafo"></h2>
             </div>
-            <button onClick="reset()" style="margin-right:10px; margin-bottom:2%" id="reset">Resetar Grafo</button>
-
-            <nav aria-label="...">
-                <ul class="pagination pagination-lg">
-                    <li id="li-insert" class="page-item active"><a id="insert" class="page-link">Insert</a></li>
-                    <li id="li-delete" class="page-item"><a id="delete" class="page-link">Delete</a></li>
-                </ul>
-            </nav>
-            <div class="d-inline-flex p-2">
-                <input onClick="changeType()" style="margin-left: 60px; margin-right:5px;" type="checkbox" id="type"
-                    name="type" checked="" />
-                <label id="type-text" for="type">Valorado</label>
-            </div>
-            <div>
-                <table>
-                    <tr>
-                        <th scope="col"><label for="Oname">Origem:</label></th>
-                        <td><input type="text" id="Oname" name="Oname" /></td>
-                    </tr>
-                    <tr id="dest-input">
-                        <th scope="col"><label for="Dname">Destino:</label></th>
-                        <td><input type="text" id="Dname" name="Dname" /></td>
-                    </tr>
-                    <tr id="value-div">
-                        <th scope="col"><label for="value">Valor:</label></th>
-                        <td><input type="text" id="value" name="value" /></td>
-                    </tr>
-                </table>
-            </div><br><br>
-
-            <div class="buttons" style="display: flex;align-items:center">
-                <button style="margin-right:10px;" id="enviar">Enviar</button>
-                <div id="tipo-div">
-                    <input style="margin-right:5px;" type="checkbox" id="tipo" name="tipo" checked="" />
-                    <label for="tipo">Arco(default: Aresta)</label>
+        </tr>
+        <tr>
+            <td>
+                <button onClick="reset()" id="reset">Resetar Grafo</button>
+                <button onClick="calcular()" id="calcular">Calcular</button>
+                <nav aria-label="...">
+                    <ul class="pagination pagination-lg">
+                        <li id="li-insert" class="page-item active"><a id="insert" class="page-link">Insert</a></li>
+                        <li id="li-delete" class="page-item"><a id="delete" class="page-link">Delete</a></li>
+                    </ul>
+                </nav>
+                <div class="d-inline-flex p-2">
+                    <input onClick="changeType()" style="margin-left: 60px; margin-right:5px;" type="checkbox" id="type"
+                        name="type" checked="" />
+                    <label id="type-text" for="type">Valorado</label>
                 </div>
-            </div>
+                <div>
+                    <table>
+                        <tr>
+                            <th scope="col"><label for="Oname">Origem:</label></th>
+                            <td><input type="text" id="Oname" name="Oname" /></td>
+                        </tr>
+                        <tr id="dest-input">
+                            <th scope="col"><label for="Dname">Destino:</label></th>
+                            <td><input type="text" id="Dname" name="Dname" /></td>
+                        </tr>
+                        <tr id="value-div">
+                            <th scope="col"><label for="value">Valor:</label></th>
+                            <td><input type="text" id="value" name="value" /></td>
+                        </tr>
+                    </table>
+                </div><br><br>
+
+                <div class="buttons" style="display: flex;align-items:center">
+                    <button style="margin-right:10px;" id="enviar">Enviar</button>
+                    <div id="tipo-div">
+                        <input style="margin-right:5px;" type="checkbox" id="tipo" name="tipo" checked="" />
+                        <label for="tipo">Arco(default: Aresta)</label>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <canvas id="grafo-canvas" width="500" height="500"/>
+            </td>
+            <td>
+                <div class="table-canvas">
+                    <canvas id="algoritimo-canvas" width="500" height="500"/>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+            <div class="wrapper"><select name="algoritimo" id="algoritimo" class="form-control" onfocus='this.size=3;' onblur='this.size=1;' onchange='algoritimoChange()'; this.blur();'>
+                <option value="PRIM">PRIM</option>
+                <option value="BFS">BFS</option>
+                <option value="DFS">DFS</option>
+            </select></div>
         </td>
-        <td>
-            <div class="table-canvas">
-                
-            </div>
-        </td>
+        </tr>
     </table>
     <script src="https://code.jquery.com/jquery-3.1.1.js"
         integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA=" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-        function getGrafo() {
-            $.ajax({
-                type: 'GET',
-                url: '/api/get',
-                success: function (result) {
-                    const [grafo, vertices] = result;
-                    $("#vertices").text(vertices);
-                    $("#grafo").text(grafo);
-                }
-            });
-        }
-        function insertVertice() {
-            var data = {};
-            data.Oname = document.getElementById('Oname').value;
-            data.Dname = document.getElementById('Dname').value;
-            data.value = document.getElementById('value').value;
-            data.tipo = document.getElementById('tipo').checked;
-            data.valorado = document.getElementById('type').checked;
-            console.log(data)
-            $.ajax({
-                type: 'POST',
-                url: '/api/insert',
-                data: data,
-                success: function () {
-                    getGrafo();
-                },
-                error: function (err) { console.log(err) }
-
-            });
-        }
-
-        function deleteVertice() {
-            var data = {};
-            data.Oname = document.getElementById('Oname').value;
-            data.Dname = document.getElementById('Dname').value;
-            data.tipo = document.getElementById('tipo').checked;
-            data.delete_type = document.getElementById('type').checked;
-
-            $.ajax({
-                type: 'POST',
-                url: '/api/remove',
-                data: data,
-                success: function () {
-                    getGrafo();
-                },
-                error: function (err) { console.log(err) }
-
-            });
-        }
-
-        function reset() {
-            var data = {};
-            $.ajax({
-                type: 'get',
-                url: '/api/reset',
-                success: function () {
-                    getGrafo();
-                },
-                error: function (err) { console.log(err) }
-
-            });
-        }
-
-        function changeType() {
-            $("#tipo-div").removeClass("invisible");
-            $("#dest-input").removeClass("invisible");
-            $("#value").val("");
-            if ($("#li-insert").hasClass("active")) {
-                $("#type-text").text("Valorado");
-                if (!$("#type").prop("checked")) $("[id=value-div]").addClass("invisible");
-                else $("[id=value-div]").removeClass("invisible");
-            } else {
-                $("#value-div").addClass("invisible");
-                if ($("#type").prop("checked")) {
-                    $("#tipo-div").addClass("invisible");
-                    $("#dest-input").addClass("invisible");
-                    $("#Dname").val("");
-                }
-                $("#type-text").text("Vertice");
-
-            }
-            //console.log($("#value-div").hasClass("invisible"))
-        }
-
-        window.addEventListener('DOMContentLoaded', function () {
-            $("#tipo").prop("checked", false);
-            $("#type").prop("checked", false);
-            changeType()
-            $("#enviar").on("click", insertVertice);
-            getGrafo();
-        })
-        $("#insert").on("click", function () {
-            $("#li-insert").addClass("active");
-            changeType();
-            event.preventDefault();
-            $("#li-delete").removeClass("active");
-            $('#enviar').unbind('click');
-            $("#enviar").attr("onclick", "insertVertice()");
-        })
-        $("#delete").on("click", function () {
-            $("#li-insert").removeClass("active");
-            changeType();
-            event.preventDefault();
-            $("#li-delete").addClass("active");
-            $('#enviar').unbind('click');
-            $("#enviar").attr("onclick", "deleteVertice()");
-        })
-
-
-        //$("#tipo").on("click", () => console.log($("#enviar").prop("click")));
-    </script>
-</body>
+    <script src="site.js"></script>
 </body>
 
 </html>

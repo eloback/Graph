@@ -1,4 +1,37 @@
+body {
+    margin-left: 5%;
+}
+
+
+.vertices {
+    display: flex;
+    align-items:center;
+}
+
+.vertices h1{
+    padding-right: 2%;
+}
+
+.grafos {
+    display: flex;
+    align-items:center;
+    margin-bottom: 2%;
+}
+
+.grafos h1{
+    padding-right: 2%;
+}
+
+td button{
+    margin-right:10px; margin-bottom:2%;
+}
+
 .table-canvas{
     margin-left: 40%;
-    width: 10%;
 }
+
+.wrapper{
+    width:200px;
+    padding:20px;
+    height: 100px;
+    }
