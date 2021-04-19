@@ -203,8 +203,8 @@ class Queue {
 
 
   remove(itemTarget){
-    if (this.isEmpty()) return null;
-    this.items = this.items.filter((item)=>item.Destino.value!=itemTarget?.value);
+    if (this.isEmpty() || !itemTarget) return null;
+    this.items = this.items.filter((item)=>item.Destino.value!=itemTarget.value);
     return itemTarget;
   }
 
