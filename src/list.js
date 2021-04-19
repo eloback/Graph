@@ -70,6 +70,14 @@ class LinkedList {
     return txt;
   }
 
+  percorre(função){
+    let node = this.getFirst();
+    while (node) {
+      função(node);
+      node = node.next;
+    }
+  }
+
   push(value){
     if (this.head)
         this.getLast().next = new ListNode(value);

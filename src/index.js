@@ -25,9 +25,9 @@ let Grafo = [A, B, C, D, F]
 /* var Grafo = []; */
 
 
-function printGrafo() {
+function printGrafo(grafo) {
   let return_string = "";
-  Grafo.map(aresta=>{
+  grafo.map(aresta=>{
     return_string+= aresta.printValue()
   })
   return return_string;
@@ -55,6 +55,40 @@ function PRIM() {
   //console.log(MST);
   return MST;
 }
+
+function BFS(saida){
+    let queue = new Queue();
+    let result = []
+    let node = Grafo.find(vertice=>vertice.value==saida);
+    let explored = [];
+    explored.push(node);
+    queue.enqueue(node);
+    while(!queue.isEmpty()){
+      let retorno;
+      let v = queue.dequeue(); //B F 
+      //console.log(v);
+      v.links.percorre((node)=>{
+        vertice = node.data
+        if(!explored.find(explorado=>explorado===vertice)){ // w não explorado
+          let entry = result.find(element=>element.value==v.value);
+          let dest = new Vertice(vertice.value, new LinkedList());
+          if(!entry){
+            entry = new Vertice(v.value, new LinkedList());
+            result.push(entry); 
+          } 
+          result.push(dest);
+          entry.adicionarArco(dest, node.linkValue);
+          queue.enqueue(vertice);
+          explored.push(vertice);
+        }else{
+          // if(v e w) não foi explorada
+          //explorar(v, w)
+        }
+      });
+    }
+    return result;
+}
+
 
 const app = express();
 app.use(express.static("public"));
@@ -150,12 +184,15 @@ app.post("/api/remove", (req, res) => {
   res.redirect("/");
 });
 
-app.get("/api/calcular/:algo", (req, res) => {
-  switch(req.params.algo){
+app.post("/api/calcular", (req, res) => {
+  let value = req.body.value;
+  let algoritimo = req.body.algo;
+  switch(algoritimo){
     case 'PRIM':
-      res.send(PRIM(Grafo));
+      //res.send(PRIM(Grafo));
       break;
     case 'BFS':
+      console.log(printGrafo(BFS(value)));
       break;
     default:
       res.send();

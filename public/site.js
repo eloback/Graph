@@ -158,10 +158,13 @@ function reset() {
 }
 
 function calcular() {
-  let Algo = $("#algoritimo").prop("value");
+  var data = {};
+  data.algo = $("#algoritimo").prop("value");
+  data.value = $("#algoritimo-input").prop("value");
   $.ajax({
-    type: "get",
-    url: "/api/calcular/" + Algo,
+    type: "post",
+    url: "/api/calcular",
+    data: data,
     success: function (data) {
       var c = document.getElementById("algoritimo-canvas");
       var ctx = c.getContext("2d");
@@ -176,16 +179,14 @@ function calcular() {
           links.link_value +
           "]</p>"
         );
-        if(!visitados){
-            visitados.push({'value':links.link[0], 'layer':layer});
+        if (!visitados) {
+          visitados.push({ value: links.link[0], layer: layer });
+        } else if (visitados.find((vertice) => vertice.value == link[0])) {
         }
-        else if(visitados.find(vertice=>vertice.value==link[0])){
-
-        }
-        visitados.push({'value':links.link[1], 'layer':layer});
-        layer = visitados[visitados.length-1].layer
+        visitados.push({ value: links.link[1], layer: layer });
+        layer = visitados[visitados.length - 1].layer;
         ctx.beginPath();
-        ctx.arc(250, 50*layer, 0, 2 * Math.PI);
+        ctx.arc(250, 50 * layer, 0, 2 * Math.PI);
         ctx.fillStyle = "#03fce3";
         ctx.fill();
         ctx.stroke();
@@ -236,6 +237,7 @@ window.addEventListener("DOMContentLoaded", function () {
   getGrafo();
   algoritimoChange();
 });
+
 $("#insert").on("click", function () {
   $("#li-insert").addClass("active");
   changeType();
@@ -244,6 +246,7 @@ $("#insert").on("click", function () {
   $("#enviar").unbind("click");
   $("#enviar").attr("onclick", "insertVertice()");
 });
+
 $("#delete").on("click", function () {
   $("#li-insert").removeClass("active");
   changeType();
@@ -252,7 +255,9 @@ $("#delete").on("click", function () {
   $("#enviar").unbind("click");
   $("#enviar").attr("onclick", "deleteVertice()");
 });
+
 function algoritimoChange() {
+  $("#algoritimo").prop("size", 1);
   let newAlgo = $("#algoritimo").prop("value");
   console.log(newAlgo);
   $("#calcular").text("Calcular " + newAlgo);
