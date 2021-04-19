@@ -165,7 +165,7 @@ function calcular() {
     url: "/api/calcular",
     data: data,
     success: function (result) {
-      if (result.algoritimo == "PRIM") {
+      /* if (result.algoritimo == "PRIM") {
         $(".table-result").html( result.data.map((vertices) => {
             return ("<p style='width:100px'>(" +
               vertices.link[0] +
@@ -176,7 +176,7 @@ function calcular() {
           
         }));
       }
-      else if(result.algoritimo == "Roy"){
+      else  */if(result.algoritimo == "Roy"){
         console.log(result.data);
       }
       else $(".table-result").html(result.data);

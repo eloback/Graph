@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3000;
 const { ListNode, LinkedList, Vertice, Queue } = require("./list");
 
 /// Como Criar um Grafo
-/* let A = new Vertice("A", new LinkedList());
+let A = new Vertice("A", new LinkedList());
 let B = new Vertice("B", new LinkedList());
 let C = new Vertice("C", new LinkedList());
 let D = new Vertice("D", new LinkedList());
@@ -20,7 +20,7 @@ C.adicionarAresta(D, 6);
 D.adicionarAresta(B, 2);
 D.adicionarAresta(F, 10);
 F.adicionarAresta(A, 5);
-let Grafo = [A, B, C, D, F]; */
+let Grafo = [A, B, C, D, F];
 //Test Roy 1
 /* let A = new Vertice("A", new LinkedList());
 let B = new Vertice("B", new LinkedList());
@@ -38,7 +38,7 @@ D.adicionarArco(E, 10);
 E.adicionarArco(A, 5);
 let Grafo = [A, B, C, D, E]; */
 //Test Roy 2
-let A = new Vertice("A", new LinkedList());
+/* let A = new Vertice("A", new LinkedList());
 let B = new Vertice("B", new LinkedList());
 let C = new Vertice("C", new LinkedList());
 let D = new Vertice("D", new LinkedList());
@@ -60,7 +60,7 @@ G.adicionarArco(A);
 G.adicionarArco(C);
 G.adicionarArco(H);
 H.adicionarArco(D);
-let Grafo = [A, B, C, D, E, F, G, H];
+let Grafo = [A, B, C, D, E, F, G, H]; */
 /* var Grafo = []; */
 
 function arrayTransformer(vertice){
@@ -94,27 +94,26 @@ function PRIM() {
   let queue = new Queue();
   let explored = [];
   // Take the smallest edge and add that to the new graph
-  while (size - 1 != MST.length || !nodeAtual) {
+  while (size != MST.length || !nodeAtual) {
     queue.fillQueue(nodeAtual);
     explored.push(nodeAtual);
     let minValue = queue.getMin(explored);
     if (minValue) {
-      /* let entry = MSF.find((element) => element.value == v.value);
-      let dest = new Vertice(vertice.value, new LinkedList());
+      let entry = MST.find((element) => element.value == minValue.Origem.value);
+      let dest = new Vertice(minValue.Destino.value, new LinkedList());
       if (!entry) {
-        entry = new Vertice(v.value, new LinkedList());
+        entry = new Vertice(minValue.Origem.value, new LinkedList());
         MST.push(entry);
       }
       MST.push(dest);
-      entry.adicionarArco(dest, node.linkValue); */
-      MST.push({
+      entry.adicionarArco(dest, minValue.Link_Value);
+      /* MST.push({
         link: [minValue.Origem.value, minValue.Destino.value],
         link_value: minValue.Link_Value,
-      });
+      }); */
       nodeAtual = minValue.Destino;
     }
   }
-  //console.log(MST);
   return MST;
 }
 
@@ -357,7 +356,7 @@ app.post("/api/calcular", (req, res, next) => {
   }
   switch (algoritimo) {
     case "PRIM":
-      res.send({ data: PRIM(Grafo), algoritimo: algoritimo });
+      res.send({ data: printGrafo(PRIM(Grafo)), algoritimo: algoritimo });
       break;
     case "BFS":
       res.send({ data: printGrafo(BFS(node)), algoritimo: algoritimo });
