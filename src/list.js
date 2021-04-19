@@ -244,4 +244,194 @@ class Queue {
   }
 }
 
-module.exports = { ListNode, LinkedList, Vertice, Queue };
+function arrayTransformer(vertice){
+  return {
+    'value':vertice.value,
+    'x':vertice.x,
+    'y':vertice.y,
+    'links': vertice.getLinks(),
+  };
+}
+
+function printGrafo(grafo) {
+  let return_string = "";
+  grafo.map((aresta) => {
+    return_string += aresta.printValue();
+  });
+  return return_string;
+}
+
+function PRIM(Grafo) {
+  let size = Grafo.length;
+  const MST = [];
+  if (size === 0) {
+    return MST;
+  }
+  let nodeAtual = Grafo[0];
+  let queue = new Queue();
+  let explored = [];
+  // Take the smallest edge and add that to the new graph
+  while (size != MST.length || !nodeAtual) {
+    queue.fillQueue(nodeAtual);
+    explored.push(nodeAtual);
+    let minValue = queue.getMin(explored);
+    if (minValue) {
+      let entry = MST.find((element) => element.value == minValue.Origem.value);
+      let dest = new Vertice(minValue.Destino.value, new LinkedList());
+      if (!entry) {
+        entry = new Vertice(minValue.Origem.value, new LinkedList());
+        MST.push(entry);
+      }
+      MST.push(dest);
+      entry.adicionarArco(dest, minValue.Link_Value);
+      /* MST.push({
+        link: [minValue.Origem.value, minValue.Destino.value],
+        link_value: minValue.Link_Value,
+      }); */
+      nodeAtual = minValue.Destino;
+    }
+  }
+  return MST;
+}
+
+function BFS(saida) {
+  let queue = new Queue();
+  let result = [];
+  let explored = [];
+  explored.push(saida);
+  queue.enqueue(saida);
+  while (!queue.isEmpty()) {
+    let retorno;
+    let v = queue.dequeue();
+    v.links.percorre((node) => {
+      vertice = node.data;
+      if (!explored.find((explorado) => explorado === vertice)) {
+        // w não explorado
+        let entry = result.find((element) => element.value == v.value);
+        let dest = new Vertice(vertice.value, new LinkedList());
+        if (!entry) {
+          entry = new Vertice(v.value, new LinkedList());
+          result.push(entry);
+        }
+        result.push(dest);
+        entry.adicionarArco(dest, node.linkValue);
+        queue.enqueue(vertice);
+        explored.push(vertice);
+      } else {
+        // if(v e w) não foi explorada
+        //explorar(v, w)
+      }
+    });
+  }
+  return result;
+}
+
+function DFS_R(result, v, explored) {
+  explored.push(v);
+  v?.links.percorre((node) => {
+    vertice = node.data;
+    if (!explored.find((explorado) => explorado === vertice)) {
+      // w não explorado
+      let entry = result.find((element) => element.value == v.value);
+      let dest = new Vertice(vertice.value, new LinkedList());
+      if (!entry) {
+        entry = new Vertice(v.value, new LinkedList());
+        result.push(entry);
+      }
+      result.push(dest);
+      entry.adicionarArco(dest, node.linkValue);
+      DFS_R(result, vertice, explored);
+    } else {
+      // if(v e w) não foi explorada
+      //explorar(v, w)
+    }
+  });
+}
+
+function DFS(saida) {
+  let result = [];
+  let explored = [];
+  explored.push(saida);
+  let v = saida;
+  v.links.percorre((node) => {
+    vertice = node.data;
+    if (!explored.find((explorado) => explorado === vertice)) {
+      // w não explorado
+      let entry = result.find((element) => element.value == v.value);
+      let dest = new Vertice(vertice.value, new LinkedList());
+      if (!entry) {
+        entry = new Vertice(v.value, new LinkedList());
+        result.push(entry);
+      }
+      result.push(dest);
+      entry.adicionarArco(dest, node.linkValue);
+      DFS_R(result, vertice, explored);
+    } else {
+      // if(v e w) não foi explorada
+      //explorar(v, w)
+    }
+  });
+  console.log(result);
+  return result;
+}
+
+function Roy(value, Grafo) {
+  let result = [];
+  let grafo = Grafo.slice();
+  let vertice = value;
+  
+  for (var i = 0; grafo.length > 0; i++) {
+    let explored_pos = [];
+    let explored_neg = [];
+    explored_pos.push(vertice);
+    explored_neg.push(vertice);
+    let change = true;
+    let grafoIteravel = grafo.filter((v) => v != vertice);
+    while (change) {
+      change = false;
+      grafoIteravel.map((ve) => {
+        ve.links.percorre((v) => {
+          if (!explored_pos.includes(ve)) {
+            explored_pos.map((explorado) => {
+              if (v.data == explorado) {
+                explored_pos.push(ve);
+                grafoIteravel = grafo.filter((vg) => vg != ve);
+                change = true;
+              }
+            });
+          }
+        });
+      });
+    }
+    change = true;
+    grafoIteravel = [vertice];
+    while (change) {
+      change = false;
+      grafoIteravel.map((ve) => {
+        ve.links.percorre((v) => {
+          if (!explored_neg.includes(v.data)) {
+            change = true;
+            explored_neg.push(v.data);
+            grafoIteravel.push(v.data);
+          }
+        });
+        grafoIteravel = grafoIteravel.filter((v) => v != ve);
+      });
+    }
+    result.push(
+      explored_pos.filter((vertice) => explored_neg.includes(vertice))
+    );
+    
+    grafo = grafo.filter((vertice) => !result[i].includes(vertice));
+    vertice = grafo[0];
+  }
+  result.forEach(solution=>solution.forEach(vertice=>{
+    vertice.links.percorre((vn=>{
+      if(!solution.includes(vn.data)) vertice.links.delete(vn.data.value);
+    }));
+  }));
+  return result;
+}
+
+
+module.exports = { ListNode, LinkedList, Vertice, Queue, PRIM, BFS, DFS, Roy, arrayTransformer, printGrafo };

@@ -4,10 +4,10 @@ var path = require("path");
 
 const PORT = process.env.PORT || 3000;
 
-const { ListNode, LinkedList, Vertice, Queue } = require("./list");
+const { ListNode, LinkedList, Vertice, Queue, PRIM, BFS, DFS, Roy, arrayTransformer, printGrafo } = require("./list");
 
 /// Como Criar um Grafo
-/* let A = new Vertice("A", new LinkedList());
+let A = new Vertice("A", new LinkedList());
 let B = new Vertice("B", new LinkedList());
 let C = new Vertice("C", new LinkedList());
 let D = new Vertice("D", new LinkedList());
@@ -20,7 +20,7 @@ C.adicionarAresta(D, 6);
 D.adicionarAresta(B, 2);
 D.adicionarAresta(F, 10);
 F.adicionarAresta(A, 5);
-let Grafo = [A, B, C, D, F]; */
+let Grafo = [A, B, C, D, F];
 //Test Roy 1
 /* let A = new Vertice("A", new LinkedList());
 let B = new Vertice("B", new LinkedList());
@@ -38,7 +38,7 @@ D.adicionarArco(E, 10);
 E.adicionarArco(A, 5);
 let Grafo = [A, B, C, D, E]; */
 //Test Roy 2
-let A = new Vertice("A", new LinkedList());
+/* let A = new Vertice("A", new LinkedList());
 let B = new Vertice("B", new LinkedList());
 let C = new Vertice("C", new LinkedList());
 let D = new Vertice("D", new LinkedList());
@@ -60,201 +60,9 @@ G.adicionarArco(A);
 G.adicionarArco(C);
 G.adicionarArco(H);
 H.adicionarArco(D);
-let Grafo = [A, B, C, D, E, F, G, H];
+let Grafo = [A, B, C, D, E, F, G, H]; */
 /* var Grafo = []; */
 
-function arrayTransformer(vertice){
-  return {
-    'value':vertice.value,
-    'x':vertice.x,
-    'y':vertice.y,
-    'links': vertice.getLinks(),
-  };
-}
-
-function printGrafo(grafo) {
-  let return_string = "";
-  /* while(grafo.length > 0) {
-    let aresta = grafo.shift();
-    return_string += aresta.printValue();
-  } */
-  grafo.map((aresta) => {
-    return_string += aresta.printValue();
-  });
-  return return_string;
-}
-
-function PRIM() {
-  let size = Grafo.length;
-  const MST = [];
-  if (size === 0) {
-    return MST;
-  }
-  let nodeAtual = Grafo[0];
-  let queue = new Queue();
-  let explored = [];
-  // Take the smallest edge and add that to the new graph
-  while (size != MST.length || !nodeAtual) {
-    queue.fillQueue(nodeAtual);
-    explored.push(nodeAtual);
-    let minValue = queue.getMin(explored);
-    if (minValue) {
-      let entry = MST.find((element) => element.value == minValue.Origem.value);
-      let dest = new Vertice(minValue.Destino.value, new LinkedList());
-      if (!entry) {
-        entry = new Vertice(minValue.Origem.value, new LinkedList());
-        MST.push(entry);
-      }
-      MST.push(dest);
-      entry.adicionarArco(dest, minValue.Link_Value);
-      /* MST.push({
-        link: [minValue.Origem.value, minValue.Destino.value],
-        link_value: minValue.Link_Value,
-      }); */
-      nodeAtual = minValue.Destino;
-    }
-  }
-  return MST;
-}
-
-function BFS(saida) {
-  let queue = new Queue();
-  let result = [];
-  let explored = [];
-  explored.push(saida);
-  queue.enqueue(saida);
-  while (!queue.isEmpty()) {
-    let retorno;
-    let v = queue.dequeue();
-    v.links.percorre((node) => {
-      vertice = node.data;
-      if (!explored.find((explorado) => explorado === vertice)) {
-        // w não explorado
-        let entry = result.find((element) => element.value == v.value);
-        let dest = new Vertice(vertice.value, new LinkedList());
-        if (!entry) {
-          entry = new Vertice(v.value, new LinkedList());
-          result.push(entry);
-        }
-        result.push(dest);
-        entry.adicionarArco(dest, node.linkValue);
-        queue.enqueue(vertice);
-        explored.push(vertice);
-      } else {
-        // if(v e w) não foi explorada
-        //explorar(v, w)
-      }
-    });
-  }
-  return result;
-}
-
-function DFS_R(result, v, explored) {
-  explored.push(v);
-  v?.links.percorre((node) => {
-    vertice = node.data;
-    if (!explored.find((explorado) => explorado === vertice)) {
-      // w não explorado
-      let entry = result.find((element) => element.value == v.value);
-      let dest = new Vertice(vertice.value, new LinkedList());
-      if (!entry) {
-        entry = new Vertice(v.value, new LinkedList());
-        result.push(entry);
-      }
-      result.push(dest);
-      entry.adicionarArco(dest, node.linkValue);
-      DFS_R(result, vertice, explored);
-    } else {
-      // if(v e w) não foi explorada
-      //explorar(v, w)
-    }
-  });
-}
-
-function DFS(saida) {
-  let result = [];
-  let explored = [];
-  explored.push(saida);
-  let v = saida;
-  v.links.percorre((node) => {
-    vertice = node.data;
-    if (!explored.find((explorado) => explorado === vertice)) {
-      // w não explorado
-      let entry = result.find((element) => element.value == v.value);
-      let dest = new Vertice(vertice.value, new LinkedList());
-      if (!entry) {
-        entry = new Vertice(v.value, new LinkedList());
-        result.push(entry);
-      }
-      result.push(dest);
-      entry.adicionarArco(dest, node.linkValue);
-      DFS_R(result, vertice, explored);
-    } else {
-      // if(v e w) não foi explorada
-      //explorar(v, w)
-    }
-  });
-  console.log(result);
-  return result;
-}
-
-function Roy(value) {
-  let result = [];
-  let grafo = Grafo.slice();
-  let vertice = value;
-  
-  for (var i = 0; grafo.length > 0; i++) {
-    let explored_pos = [];
-    let explored_neg = [];
-    explored_pos.push(vertice);
-    explored_neg.push(vertice);
-    let change = true;
-    let grafoIteravel = grafo.filter((v) => v != vertice);
-    while (change) {
-      change = false;
-      grafoIteravel.map((ve) => {
-        ve.links.percorre((v) => {
-          if (!explored_pos.includes(ve)) {
-            explored_pos.map((explorado) => {
-              if (v.data == explorado) {
-                explored_pos.push(ve);
-                grafoIteravel = grafo.filter((vg) => vg != ve);
-                change = true;
-              }
-            });
-          }
-        });
-      });
-    }
-    change = true;
-    grafoIteravel = [vertice];
-    while (change) {
-      change = false;
-      grafoIteravel.map((ve) => {
-        ve.links.percorre((v) => {
-          if (!explored_neg.includes(v.data)) {
-            change = true;
-            explored_neg.push(v.data);
-            grafoIteravel.push(v.data);
-          }
-        });
-        grafoIteravel = grafoIteravel.filter((v) => v != ve);
-      });
-    }
-    result.push(
-      explored_pos.filter((vertice) => explored_neg.includes(vertice))
-    );
-    
-    grafo = grafo.filter((vertice) => !result[i].includes(vertice));
-    vertice = grafo[0];
-  }
-  result.forEach(solution=>solution.forEach(vertice=>{
-    vertice.links.percorre((vn=>{
-      if(!solution.includes(vn.data)) vertice.links.delete(vn.data.value);
-    }));
-  }));
-  return result;
-}
 
 const app = express();
 app.use(express.static("public"));
@@ -356,17 +164,16 @@ app.post("/api/calcular", (req, res, next) => {
   }
   switch (algoritimo) {
     case "PRIM":
-      res.send({ data: printGrafo(PRIM(Grafo)), algoritimo: algoritimo });
+      res.send({ data: PRIM(Grafo).map(vertice=>arrayTransformer(vertice)), algoritimo: algoritimo });
       break;
     case "BFS":
-      res.send({ data: printGrafo(BFS(node)), algoritimo: algoritimo });
+      res.send({ data: BFS(node).map(vertice=>arrayTransformer(vertice)), algoritimo: algoritimo });
       break;
     case "DFS":
-      res.send({ data: printGrafo(DFS(node)), algoritimo: algoritimo });
+      res.send({ data: DFS(node).map(vertice=>arrayTransformer(vertice)), algoritimo: algoritimo });
       break;
     case "Roy":
-      //SendData = Roy(node).map(solution=>solution.map(vertice=>arrayTransformer(vertice)));
-      res.send({ data: Roy(node).map(solution=>{return "<p>S: "+printGrafo(solution)+"</p>"}), algoritimo: algoritimo });
+      res.send({ data: Roy(node, Grafo).map(solution=>{return "S: "+printGrafo(solution)}), algoritimo: algoritimo });
       break;
     default:
       res.send();

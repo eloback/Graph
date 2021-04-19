@@ -1,3 +1,4 @@
+
 function canvas_arrow(context, fromx, fromy, tox, toy) {
   var headlen = 10; // length of head in pixels
   var dx = tox - fromx;
@@ -60,7 +61,7 @@ function getGrafo() {
     success: function (result) {
       var c = document.getElementById("grafo-canvas");
       var ctx = c.getContext("2d");
-      ctx.clearRect(0, 0, c.width, c.height)
+      ctx.clearRect(0, 0, c.width, c.height);
       const [grafo, vertices] = result;
 
       $("#grafo").text(
@@ -91,7 +92,7 @@ function getGrafo() {
       $("#vertices").text(
         vertices.map((vertice) => {
           ctx.beginPath();
-          ctx.arc(vertice.x, vertice.y, 20, 0, 2 * Math.PI);
+          ctx.arc(vertice.x, vertice.y, radius, 0, 2 * Math.PI);
           ctx.fillStyle = "#03fce3";
           ctx.fill();
           ctx.stroke();
@@ -165,44 +166,47 @@ function calcular() {
     url: "/api/calcular",
     data: data,
     success: function (result) {
-      /* if (result.algoritimo == "PRIM") {
-        $(".table-result").html( result.data.map((vertices) => {
-            return ("<p style='width:100px'>(" +
-              vertices.link[0] +
-              vertices.link[1] +
-              ")[" +
-              vertices.link_value +
-              "]</p>");
-          
-        }));
-      }
-      else  *//* if(result.algoritimo == "Roy"){
-        console.log(result.data);
-      }
-      else  */$(".table-result").html(result.data);
-      /* if (!visitados) {
-          visitados.push({ value: links.link[0], layer: layer });
-        } else if (visitados.find((vertice) => vertice.value == link[0])) {
-        }
-        visitados.push({ value: links.link[1], layer: layer });
-        layer = visitados[visitados.length - 1].layer;
-        ctx.beginPath();
-        ctx.arc(250, 50 * layer, 0, 2 * Math.PI);
-        ctx.fillStyle = "#03fce3";
-        ctx.fill();
-        ctx.stroke();
-        ctx.font = "15px Arial";
-        ctx.strokeText(vertice.value, vertice.x - 5, vertice.y + 5);
-        layer++; */
+      var c = document.getElementById("algoritimo-canvas");
+        var ctx = c.getContext("2d");
+        ctx.clearRect(0, 0, c.width, c.height);
+      if (result.algoritimo != "Roy") {
         
-      /* draw_line2(
-        vertice.x,
-        vertice.y,
-        radius,
-        element.x,
-        element.y,
-        radius
-      ); */
+        
+        result.data[0].x = 250;
+        result.data[0].y = 35;
+        let fila = [];
+        vertice = result.data[0];
+        while (vertice) {
+          let N = vertice.links.length / 2 - 1;
+          let T = 30;
+          let D = 70;
+          let Dy = 100;
+          let TiR = T - (T - D) / 2;
+          xi = (D + T) * N + TiR;
+          xi = vertice.x - xi;
+          vertice.links.forEach((link) => {
+            ve = result.data.find((v) => v.value == link.value);
+            ve.x = xi + D * fila.length;
+            ve.y = vertice.y + Dy;
+            draw_line2(ctx, vertice.x, vertice.y, radius, ve.x, ve.y, radius);
+            fila.push(ve);
+          });
+          ctx.beginPath();
+          ctx.arc(vertice.x, vertice.y, radius, 0, 2 * Math.PI);
+          ctx.fillStyle = "#03fce3";
+          ctx.fill();
+          ctx.stroke();
+          ctx.font = "15px Arial";
+          ctx.strokeText(vertice.value, vertice.x - 5, vertice.y + 5);
+          vertice = fila.shift();
+        }
+      } else{
+        ctx.font = "15px Arial";
+        console.log(result.data);
+          result.data.forEach((grafo)=>{
+            ctx.strokeText(grafo, 0, c.height/2);
+          });
+      }
     },
     error: function (err) {
       console.log(err);
