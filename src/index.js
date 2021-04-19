@@ -146,16 +146,7 @@ app.post("/api/insert", (req, res) => {
   }
   if (!usingOrigin && Ve.value != "") Grafo.push(Ve); ////  se não existe e não é vazio adiciona no array
   if (!usingTarget && Ve2.value != "") Grafo.push(Ve2);
-
-  /*  let node = Grafo.getFirst();
-  console.log(Grafo.size());
-  while (node) {
-    if (node.data.links)
-      console.log(node.data.value + " " + node.data.links.size());
-    else console.log("fail " + node.data.value);
-    node = node.next;
-  } */
-
+  
   res.redirect("/");
 });
 
