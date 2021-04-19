@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3000;
 const { ListNode, LinkedList, Vertice, Queue } = require("./list");
 
 /// Como Criar um Grafo
-let A = new Vertice("A", new LinkedList());
+/* let A = new Vertice("A", new LinkedList());
 let B = new Vertice("B", new LinkedList());
 let C = new Vertice("C", new LinkedList());
 let D = new Vertice("D", new LinkedList());
@@ -20,12 +20,55 @@ C.adicionarAresta(D, 6);
 D.adicionarAresta(B, 2);
 D.adicionarAresta(F, 10);
 F.adicionarAresta(A, 5);
-let Grafo = [A, B, C, D, F];
+let Grafo = [A, B, C, D, F]; */
+//Test Roy 1
+/* let A = new Vertice("A", new LinkedList());
+let B = new Vertice("B", new LinkedList());
+let C = new Vertice("C", new LinkedList());
+let D = new Vertice("D", new LinkedList());
+let E = new Vertice("E", new LinkedList());
 
+A.adicionarArco(B, 3);
+
+B.adicionarArco(C, 7);
+B.adicionarArco(D, 2);
+C.adicionarArco(D, 6);
+D.adicionarArco(B, 2);
+D.adicionarArco(E, 10);
+E.adicionarArco(A, 5);
+let Grafo = [A, B, C, D, E]; */
+//Test Roy 2
+let A = new Vertice("A", new LinkedList());
+let B = new Vertice("B", new LinkedList());
+let C = new Vertice("C", new LinkedList());
+let D = new Vertice("D", new LinkedList());
+let E = new Vertice("E", new LinkedList());
+let F = new Vertice("F", new LinkedList());
+let G = new Vertice("G", new LinkedList());
+let H = new Vertice("H", new LinkedList());
+
+A.adicionarArco(B);
+
+B.adicionarArco(E);
+B.adicionarArco(G);
+C.adicionarArco(A);
+C.adicionarArco(D);
+D.adicionarArco(F);
+E.adicionarArco(H);
+F.adicionarArco(E);
+G.adicionarArco(A);
+G.adicionarArco(C);
+G.adicionarArco(H);
+H.adicionarArco(D);
+let Grafo = [A, B, C, D, E, F, G, H];
 /* var Grafo = []; */
 
 function printGrafo(grafo) {
   let return_string = "";
+  /* while(grafo.length > 0) {
+    let aresta = grafo.shift();
+    return_string += aresta.printValue();
+  } */
   grafo.map((aresta) => {
     return_string += aresta.printValue();
   });
@@ -69,12 +112,9 @@ function PRIM() {
 function BFS(saida) {
   let queue = new Queue();
   let result = [];
-  let node;
-  if (saida) node = Grafo.find((vertice) => vertice.value == saida);
-  else node = Grafo[0];
   let explored = [];
-  explored.push(node);
-  queue.enqueue(node);
+  explored.push(saida);
+  queue.enqueue(saida);
   while (!queue.isEmpty()) {
     let retorno;
     let v = queue.dequeue();
@@ -108,14 +148,14 @@ function DFS_R(result, v, explored) {
     if (!explored.find((explorado) => explorado === vertice)) {
       // w não explorado
       let entry = result.find((element) => element.value == v.value);
-        let dest = new Vertice(vertice.value, new LinkedList());
-        if (!entry) {
-          entry = new Vertice(v.value, new LinkedList());
-          result.push(entry);
-        }
-        result.push(dest);
-        entry.adicionarArco(dest, node.linkValue);
-        DFS_R(result, vertice, explored)
+      let dest = new Vertice(vertice.value, new LinkedList());
+      if (!entry) {
+        entry = new Vertice(v.value, new LinkedList());
+        result.push(entry);
+      }
+      result.push(dest);
+      entry.adicionarArco(dest, node.linkValue);
+      DFS_R(result, vertice, explored);
     } else {
       // if(v e w) não foi explorada
       //explorar(v, w)
@@ -125,12 +165,9 @@ function DFS_R(result, v, explored) {
 
 function DFS(saida) {
   let result = [];
-  let inode;
-  if (saida) inode = Grafo.find((vertice) => vertice.value == saida);
-  else inode = Grafo[0];
   let explored = [];
-  explored.push(inode);
-  let v = inode;
+  explored.push(saida);
+  let v = saida;
   v.links.percorre((node) => {
     vertice = node.data;
     if (!explored.find((explorado) => explorado === vertice)) {
@@ -149,7 +186,50 @@ function DFS(saida) {
       //explorar(v, w)
     }
   });
+  console.log(result);
   return result;
+}
+
+function Roy(value) {
+  let grafo_pos = Grafo.slice();
+  let grafo_neg = [];
+  let vertice = value;
+  let explored_pos = [];
+  let explored_neg = [];
+  explored_pos.push(vertice);
+  explored_neg.push(vertice);
+  grafo_pos = grafo_pos.filter((v) => v != vertice);
+  grafo_neg.push(vertice);
+  let change = true;
+  while (change) {
+    change = false;
+    grafo_pos.map((ve) => {
+      ve.links.percorre((v) => {
+        if (!explored_pos.includes(ve)) {
+          explored_pos.map((explorado) => {
+            if (v.data == explorado) {
+              explored_pos.push(ve);
+              grafo_pos = grafo_pos.filter((vg) => vg != ve);
+              change = true;
+            }
+          });
+        }
+      });
+    });
+    grafo_neg.map((ve) => {
+      ve.links.percorre((v) => {
+        if (!explored_neg.includes(v.data)) {
+          change = true;
+          explored_neg.push(v.data);
+          grafo_neg.push(v.data);
+        }
+      });
+      grafo_neg = grafo_neg.filter((v) => v != ve);
+    });
+  }
+  console.log(explored_pos);
+  console.log(explored_neg);
+  return explored_pos;
 }
 
 const app = express();
@@ -245,18 +325,30 @@ app.post("/api/remove", (req, res) => {
   res.redirect("/");
 });
 
-app.post("/api/calcular", (req, res) => {
+app.post("/api/calcular", (req, res, next) => {
   let value = req.body.value;
   let algoritimo = req.body.algo;
+  let node;
+  if (value) node = Grafo.find((vertice) => vertice.value == value);
+  else node = Grafo[0];
+  if (!node) {
+    console.log("Saida não encontrada");
+    return res.status(400).send(new Error("Saida não encontrada"));
+  }
   switch (algoritimo) {
     case "PRIM":
       res.send({ data: PRIM(Grafo), algoritimo: algoritimo });
       break;
     case "BFS":
-      res.send({ data: printGrafo(BFS(value)), algoritimo: algoritimo });
+      res.send({ data: printGrafo(BFS(node)), algoritimo: algoritimo });
       break;
     case "DFS":
-      res.send({ data: printGrafo(DFS(value)), algoritimo: algoritimo });
+      res.send({ data: printGrafo(DFS(node)), algoritimo: algoritimo });
+      break;
+    case "Roy":
+      //res.send({ data: printGrafo(Roy(node)), algoritimo: algoritimo });
+      Roy(node);
+      res.send();
       break;
     default:
       res.send();

@@ -74,7 +74,7 @@ function getGrafo() {
               element.y,
               radius
             );
-            if (vertice.linkValue)
+            if (element.linkValue)
               return (
                 " (" +
                 vertice.value +
@@ -176,8 +176,7 @@ function calcular() {
           
         }));
       }
-      else if (result.algoritimo == "BFS") $(".table-result").html(result.data);
-      else if (result.algoritimo == "DFS") $(".table-result").html(result.data);
+      else $(".table-result").html(result.data);
       /* if (!visitados) {
           visitados.push({ value: links.link[0], layer: layer });
         } else if (visitados.find((vertice) => vertice.value == link[0])) {
