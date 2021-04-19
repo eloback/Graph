@@ -110,7 +110,6 @@ function insertVertice() {
   data.value = document.getElementById("value").value;
   data.tipo = document.getElementById("tipo").checked;
   data.valorado = document.getElementById("type").checked;
-  console.log(data);
   $.ajax({
     type: "POST",
     url: "/api/insert",
@@ -176,7 +175,9 @@ function calcular() {
               "]</p>");
           
         }));
-      } else if (result.algoritimo == "BFS") $(".table-result").html(result.data);
+      }
+      else if (result.algoritimo == "BFS") $(".table-result").html(result.data);
+      else if (result.algoritimo == "DFS") $(".table-result").html(result.data);
       /* if (!visitados) {
           visitados.push({ value: links.link[0], layer: layer });
         } else if (visitados.find((vertice) => vertice.value == link[0])) {
@@ -224,7 +225,6 @@ function changeType() {
     }
     $("#type-text").text("Vertice");
   }
-  //console.log($("#value-div").hasClass("invisible"))
 }
 
 window.addEventListener("DOMContentLoaded", function () {

@@ -70,7 +70,7 @@ function BFS(saida) {
   let queue = new Queue();
   let result = [];
   let node;
-  if(saida) node = Grafo.find((vertice) => vertice.value == saida);
+  if (saida) node = Grafo.find((vertice) => vertice.value == saida);
   else node = Grafo[0];
   let explored = [];
   explored.push(node);
@@ -98,6 +98,57 @@ function BFS(saida) {
       }
     });
   }
+  return result;
+}
+
+function DFS_R(result, v, explored) {
+  explored.push(v);
+  v?.links.percorre((node) => {
+    vertice = node.data;
+    if (!explored.find((explorado) => explorado === vertice)) {
+      // w não explorado
+      let entry = result.find((element) => element.value == v.value);
+        let dest = new Vertice(vertice.value, new LinkedList());
+        if (!entry) {
+          entry = new Vertice(v.value, new LinkedList());
+          result.push(entry);
+        }
+        result.push(dest);
+        entry.adicionarArco(dest, node.linkValue);
+        DFS_R(result, vertice, explored)
+    } else {
+      // if(v e w) não foi explorada
+      //explorar(v, w)
+    }
+  });
+}
+
+function DFS(saida) {
+  let result = [];
+  let inode;
+  if (saida) inode = Grafo.find((vertice) => vertice.value == saida);
+  else inode = Grafo[0];
+  let explored = [];
+  explored.push(inode);
+  let v = inode;
+  v.links.percorre((node) => {
+    vertice = node.data;
+    if (!explored.find((explorado) => explorado === vertice)) {
+      // w não explorado
+      let entry = result.find((element) => element.value == v.value);
+      let dest = new Vertice(vertice.value, new LinkedList());
+      if (!entry) {
+        entry = new Vertice(v.value, new LinkedList());
+        result.push(entry);
+      }
+      result.push(dest);
+      entry.adicionarArco(dest, node.linkValue);
+      DFS_R(result, vertice, explored);
+    } else {
+      // if(v e w) não foi explorada
+      //explorar(v, w)
+    }
+  });
   return result;
 }
 
@@ -199,10 +250,13 @@ app.post("/api/calcular", (req, res) => {
   let algoritimo = req.body.algo;
   switch (algoritimo) {
     case "PRIM":
-      res.send({'data':PRIM(Grafo),'algoritimo': algoritimo});
+      res.send({ data: PRIM(Grafo), algoritimo: algoritimo });
       break;
     case "BFS":
-      res.send({'data':printGrafo(BFS(value)),'algoritimo': algoritimo});
+      res.send({ data: printGrafo(BFS(value)), algoritimo: algoritimo });
+      break;
+    case "DFS":
+      res.send({ data: printGrafo(DFS(value)), algoritimo: algoritimo });
       break;
     default:
       res.send();
