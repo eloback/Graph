@@ -176,6 +176,9 @@ function calcular() {
           
         }));
       }
+      else if(result.algoritimo == "Roy"){
+        console.log(result.data);
+      }
       else $(".table-result").html(result.data);
       /* if (!visitados) {
           visitados.push({ value: links.link[0], layer: layer });
