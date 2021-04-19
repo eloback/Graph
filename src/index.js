@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3000;
 const { ListNode, LinkedList, Vertice, Queue } = require("./list");
 
 /// Como Criar um Grafo
-let A = new Vertice("A", new LinkedList());
+/* let A = new Vertice("A", new LinkedList());
 let B = new Vertice("B", new LinkedList());
 let C = new Vertice("C", new LinkedList());
 let D = new Vertice("D", new LinkedList());
@@ -20,7 +20,7 @@ C.adicionarAresta(D, 6);
 D.adicionarAresta(B, 2);
 D.adicionarAresta(F, 10);
 F.adicionarAresta(A, 5);
-let Grafo = [A, B, C, D, F];
+let Grafo = [A, B, C, D, F]; */
 //Test Roy 1
 /* let A = new Vertice("A", new LinkedList());
 let B = new Vertice("B", new LinkedList());
@@ -38,7 +38,7 @@ D.adicionarArco(E, 10);
 E.adicionarArco(A, 5);
 let Grafo = [A, B, C, D, E]; */
 //Test Roy 2
-/* let A = new Vertice("A", new LinkedList());
+let A = new Vertice("A", new LinkedList());
 let B = new Vertice("B", new LinkedList());
 let C = new Vertice("C", new LinkedList());
 let D = new Vertice("D", new LinkedList());
@@ -60,7 +60,7 @@ G.adicionarArco(A);
 G.adicionarArco(C);
 G.adicionarArco(H);
 H.adicionarArco(D);
-let Grafo = [A, B, C, D, E, F, G, H]; */
+let Grafo = [A, B, C, D, E, F, G, H];
 /* var Grafo = []; */
 
 function arrayTransformer(vertice){
@@ -365,8 +365,8 @@ app.post("/api/calcular", (req, res, next) => {
       res.send({ data: printGrafo(DFS(node)), algoritimo: algoritimo });
       break;
     case "Roy":
-      SendData = Roy(node).map(solution=>solution.map(vertice=>arrayTransformer(vertice)));
-      res.send({ data: SendData, algoritimo: algoritimo });
+      //SendData = Roy(node).map(solution=>solution.map(vertice=>arrayTransformer(vertice)));
+      res.send({ data: Roy(node).map(solution=>{return "<p>S: "+printGrafo(solution)+"</p>"}), algoritimo: algoritimo });
       break;
     default:
       res.send();
