@@ -60,6 +60,7 @@ function getGrafo() {
     success: function (result) {
       var c = document.getElementById("grafo-canvas");
       var ctx = c.getContext("2d");
+      ctx.clearRect(0, 0, c.width, c.height)
       const [grafo, vertices] = result;
 
       $("#grafo").text(
@@ -129,7 +130,6 @@ function deleteVertice() {
   data.Dname = document.getElementById("Dname").value;
   data.tipo = document.getElementById("tipo").checked;
   data.delete_type = document.getElementById("type").checked;
-
   $.ajax({
     type: "POST",
     url: "/api/remove",

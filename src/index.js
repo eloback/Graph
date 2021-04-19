@@ -191,6 +191,7 @@ function DFS(saida) {
 }
 
 function Roy(value) {
+  let result = []
   let grafo_pos = Grafo.slice();
   let grafo_neg = [];
   let vertice = value;
@@ -227,8 +228,8 @@ function Roy(value) {
       grafo_neg = grafo_neg.filter((v) => v != ve);
     });
   }
-  console.log(explored_pos);
-  console.log(explored_neg);
+  result.push(explored_pos.filter(vertice=>explored_neg.includes(vertice)));
+  console.log(result);
   return explored_pos;
 }
 
@@ -306,7 +307,7 @@ app.post("/api/remove", (req, res) => {
   const tipo = req.body.tipo;
   const removeVertice = req.body.delete_type; // Aresta/arco ou vertice
   let Ve = Grafo.find((aresta) => aresta.value == originName);
-  if (removeVertice) {
+  if (removeVertice == "true") {
     if (Ve) {
       Grafo.map((aresta) => aresta.links.delete(Ve.value));
       Grafo = Grafo.filter((aresta) => aresta !== Ve);
