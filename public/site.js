@@ -166,10 +166,6 @@ function calcular() {
     url: "/api/calcular",
     data: data,
     success: function (result) {
-      var c = document.getElementById("algoritimo-canvas");
-      var ctx = c.getContext("2d");
-      let visitados = [];
-      let layer = 0;
       if (result.algoritimo == "PRIM") {
         $(".table-result").html( result.data.map((vertices) => {
             return ("<p style='width:100px'>(" +
