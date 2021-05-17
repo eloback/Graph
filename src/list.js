@@ -108,11 +108,11 @@ class LinkedList {
 }
 
 class Vertice {
-  constructor(value, list) {
+  constructor(value, list, x = Math.random() * (max - min) + min, y= Math.random() * (max - min) + min) {
     this.value = value;
     this.links = list;
-    this.x = Math.random() * (max - min) + min;
-    this.y = Math.random() * (max - min) + min;
+    this.x = x;
+    this.y = y;
   }
 
   adicionarArco(vertice) {
@@ -163,7 +163,7 @@ class Queue {
   constructor() {
     this.items = [];
   }
-  
+
   // Functions to be implemented
   // enqueue function
   enqueue(element) {
@@ -233,7 +233,7 @@ class Queue {
       node = node.next;
     }
   }
-  getMin(explored) {  // [ {Value / Links}, ... ] // 
+  getMin(explored) {  // [ {Value / Links}, ... ] //
     let min;
     this.clear(explored);
     this.items.map((item) => {
@@ -379,7 +379,7 @@ function Roy(value, Grafo) {
   let result = [];
   let grafo = Grafo.slice();
   let vertice = value;
-  
+
   for (var i = 0; grafo.length > 0; i++) {
     let explored_pos = [];
     let explored_neg = [];
@@ -421,7 +421,7 @@ function Roy(value, Grafo) {
     result.push(
       explored_pos.filter((vertice) => explored_neg.includes(vertice))
     );
-    
+
     grafo = grafo.filter((vertice) => !result[i].includes(vertice));
     vertice = grafo[0];
   }

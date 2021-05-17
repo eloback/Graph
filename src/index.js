@@ -94,9 +94,11 @@ app.post("/api/insert", (req, res) => {
   const value = Number(req.body.value);
   const tipo = req.body.tipo;
   const valorado = req.body.valorado;
+  const originCord = {x:req.body.originX, y:req.body.originY};
+  const targetCord = {x:req.body.targetX, y:req.body.targetY};
   // declara Vertices
-  let Ve = new Vertice(originName, new LinkedList());
-  let Ve2 = new Vertice(targetName, new LinkedList());
+  let Ve = originCord.x ? new Vertice(originName, new LinkedList(), Number(originCord.x), Number(originCord.y)) : new Vertice(originName, new LinkedList());
+  let Ve2 = targetCord.y ?  new Vertice(targetName, new LinkedList(), Number(targetCord.x), Number(targetCord.y)) : new Vertice(targetName, new LinkedList()) ;
   if (Grafo) {
     //////////////////////////////////  Verifica se vertice já existe no array
     let VeP = Grafo.find((aresta) => aresta.value == Ve.value);

@@ -1,3 +1,8 @@
+let originX = null;
+let originY = null;
+let targetX = null;
+let targetY = null;
+let grafos = null;
 
 function canvas_arrow(context, fromx, fromy, tox, toy) {
   var headlen = 10; // length of head in pixels
@@ -41,10 +46,10 @@ function draw_line2(
 }
 
 function vec2(x, y) {
-  this.length = function () {
+  this.length = function() {
     return Math.sqrt(this.x * this.x + this.y * this.y);
   };
-  this.normalize = function () {
+  this.normalize = function() {
     var scale = this.length();
     this.x /= scale;
     this.y /= scale;
@@ -54,55 +59,61 @@ function vec2(x, y) {
 }
 
 let radius = 20;
+
 function getGrafo() {
   $.ajax({
     type: "GET",
     url: "/api/get",
-    success: function (result) {
-      var c = document.getElementById("grafo-canvas");
-      var ctx = c.getContext("2d");
-      ctx.clearRect(0, 0, c.width, c.height);
+    success: function(result) {
       const [grafo, vertices] = result;
-
-      $("#grafo").text(
-        grafo.map((vertice) => {
-          return vertice.links.map((element) => {
-            draw_line2(
-              ctx,
-              vertice.x,
-              vertice.y,
-              radius,
-              element.x,
-              element.y,
-              radius
-            );
-            if (element.linkValue)
-              return (
-                " (" +
-                vertice.value +
-                element.value +
-                ")[" +
-                element.linkValue +
-                "]"
-              );
-            else return " (" + vertice.value + element.value + ")";
-          });
-        })
-      );
-      $("#vertices").text(
-        vertices.map((vertice) => {
-          ctx.beginPath();
-          ctx.arc(vertice.x, vertice.y, radius, 0, 2 * Math.PI);
-          ctx.fillStyle = "#03fce3";
-          ctx.fill();
-          ctx.stroke();
-          ctx.font = "15px Arial";
-          ctx.strokeText(vertice.value, vertice.x - 5, vertice.y + 5);
-          return vertice.value;
-        })
-      );
+      grafos = result;
+      desenhaGrafo(grafo, vertices);
     },
   });
+}
+
+function desenhaGrafo(grafo, vertices){
+  var c = document.getElementById("grafo-canvas");
+  var ctx = c.getContext("2d");
+  ctx.clearRect(0, 0, c.width, c.height);
+
+  $("#grafo").text(
+    grafo.map((vertice) => {
+      return vertice.links.map((element) => {
+        draw_line2(
+          ctx,
+          vertice.x,
+          vertice.y,
+          radius,
+          element.x,
+          element.y,
+          radius
+        );
+        if (element.linkValue)
+          return (
+            " (" +
+            vertice.value +
+            element.value +
+            ")[" +
+            element.linkValue +
+            "]"
+          );
+        else return " (" + vertice.value + element.value + ")";
+      });
+    })
+  );
+  $("#vertices").text(
+    vertices.map((vertice) => {
+      ctx.beginPath();
+      ctx.arc(vertice.x, vertice.y, radius, 0, 2 * Math.PI);
+      ctx.fillStyle = "#03fce3";
+      ctx.fill();
+      ctx.stroke();
+      ctx.font = "15px Arial";
+      ctx.strokeText(vertice.value, vertice.x - 5, vertice.y + 5);
+      return vertice.value;
+    })
+  );
 }
 
 function insertVertice() {
@@ -112,14 +123,18 @@ function insertVertice() {
   data.value = document.getElementById("value").value;
   data.tipo = document.getElementById("tipo").checked;
   data.valorado = document.getElementById("type").checked;
+  data.originX = originX;
+  data.originY = originY;
+  data.targetX =  targetX;
+  data.targetY = targetY;
   $.ajax({
     type: "POST",
     url: "/api/insert",
     data: data,
-    success: function () {
+    success: function() {
       getGrafo();
     },
-    error: function (err) {
+    error: function(err) {
       console.log(err);
     },
   });
@@ -135,10 +150,10 @@ function deleteVertice() {
     type: "POST",
     url: "/api/remove",
     data: data,
-    success: function () {
+    success: function() {
       getGrafo();
     },
-    error: function (err) {
+    error: function(err) {
       console.log(err);
     },
   });
@@ -148,10 +163,10 @@ function reset() {
   $.ajax({
     type: "get",
     url: "/api/reset",
-    success: function () {
+    success: function() {
       getGrafo();
     },
-    error: function (err) {
+    error: function(err) {
       console.log(err);
     },
   });
@@ -165,13 +180,13 @@ function calcular() {
     type: "post",
     url: "/api/calcular",
     data: data,
-    success: function (result) {
+    success: function(result) {
       var c = document.getElementById("algoritimo-canvas");
-        var ctx = c.getContext("2d");
-        ctx.clearRect(0, 0, c.width, c.height);
+      var ctx = c.getContext("2d");
+      ctx.clearRect(0, 0, c.width, c.height);
       if (result.algoritimo != "Roy") {
-        
-        
+
+
         result.data[0].x = 250;
         result.data[0].y = 35;
         let fila = [];
@@ -200,15 +215,15 @@ function calcular() {
           ctx.strokeText(vertice.value, vertice.x - 5, vertice.y + 5);
           vertice = fila.shift();
         }
-      } else{
+      } else {
         ctx.font = "15px Arial";
         console.log(result.data);
-          result.data.forEach((grafo)=>{
-            ctx.strokeText(grafo, 0, c.height/2);
-          });
+        result.data.forEach((grafo) => {
+          ctx.strokeText(grafo, 0, c.height / 2);
+        });
       }
     },
-    error: function (err) {
+    error: function(err) {
       console.log(err);
     },
   });
@@ -233,16 +248,21 @@ function changeType() {
   }
 }
 
-window.addEventListener("DOMContentLoaded", function () {
+window.addEventListener("DOMContentLoaded", function() {
   $("#tipo").prop("checked", false);
   $("#type").prop("checked", false);
   changeType();
   $("#enviar").on("click", insertVertice);
   getGrafo();
   algoritimoChange();
+  let canvasElem = document.getElementById("grafo-canvas");
+  canvasElem.addEventListener("mousedown", function(e)
+        {
+            selectArea  (canvasElem, e);
+        });
 });
 
-$("#insert").on("click", function () {
+$("#insert").on("click", function() {
   $("#li-insert").addClass("active");
   changeType();
   event.preventDefault();
@@ -251,7 +271,7 @@ $("#insert").on("click", function () {
   $("#enviar").attr("onclick", "insertVertice()");
 });
 
-$("#delete").on("click", function () {
+$("#delete").on("click", function() {
   $("#li-insert").removeClass("active");
   changeType();
   event.preventDefault();
@@ -264,4 +284,38 @@ function algoritimoChange() {
   $("#algoritimo").prop("size", 1);
   let newAlgo = $("#algoritimo").prop("value");
   $("#calcular").text("Calcular " + newAlgo);
+}
+
+function selectArea(canvas, event) {
+  let rect = canvas.getBoundingClientRect();
+  var ctx = canvas.getContext("2d");
+  let x = event.clientX - rect.left;
+  let y = event.clientY - rect.top;
+  if(originX == null || (originX != null && targetX != null)){
+    var [grafo, vertice] = grafos;
+    desenhaGrafo(grafo, vertice);
+    originX = x;
+    originY = y;
+    targetX = targetY = null;
+    ctx.fillStyle = "#ff0000";
+  }
+  else{
+    targetX = x;
+    targetY = y;
+    ctx.fillStyle = "#0000ff";
+    draw_line2(
+      ctx,
+      originX,
+      originY,
+      radius,
+      x,
+      y,
+      radius
+    );
+  }
+
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, 2 * Math.PI);
+  ctx.fill();
+
 }
