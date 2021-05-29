@@ -4,23 +4,23 @@ var path = require("path");
 
 const PORT = process.env.PORT || 3000;
 
-const { ListNode, LinkedList, Vertice, Queue, PRIM, BFS, DFS, Roy, arrayTransformer, printGrafo } = require("./list");
+const {
+  ListNode,
+  LinkedList,
+  Vertice,
+  Queue,
+  PRIM,
+  BFS,
+  DFS,
+  Roy,
+  arrayTransformer,
+  printGrafo,
+  WelshPowell,
+  shortestPath
+} = require("./list");
 
 /// Como Criar um Grafo
-let A = new Vertice("A", new LinkedList());
-let B = new Vertice("B", new LinkedList());
-let C = new Vertice("C", new LinkedList());
-let D = new Vertice("D", new LinkedList());
-let F = new Vertice("F", new LinkedList());
-
-A.adicionarAresta(B, 3);
-
-B.adicionarAresta(C, 7);
-C.adicionarAresta(D, 6);
-D.adicionarAresta(B, 2);
-D.adicionarAresta(F, 10);
-F.adicionarAresta(A, 5);
-let Grafo = [A, B, C, D, F];
+let Grafo = [];
 //Test Roy 1
 /* let A = new Vertice("A", new LinkedList());
 let B = new Vertice("B", new LinkedList());
@@ -62,15 +62,51 @@ G.adicionarArco(H);
 H.adicionarArco(D);
 let Grafo = [A, B, C, D, E, F, G, H]; */
 /* var Grafo = []; */
-
+const returnMapa = () => {
+  let A = new Vertice("Foz do Iguaçu", new LinkedList(), 50, 400, null, 25.5163, 54.5854);
+  let B = new Vertice("Cascavel", new LinkedList(), 100, 340,null, 24.9578, 53.4595);
+  let C = new Vertice("Toledo", new LinkedList(), 80, 280,null, 24.7251, 53.7417);
+  let D = new Vertice("Umuarama", new LinkedList(), 140, 200,null, 23.7661, 53.3206);
+  let E = new Vertice("Maringa", new LinkedList(), 230, 170,null, 23.4210, 51.9331);
+  let F = new Vertice("Londrina", new LinkedList(), 300, 195,null, 23.3045, 51.1696);
+  let G = new Vertice("Ponta Grossa", new LinkedList(), 300, 320,null, 25.0994, 50.1583);
+  let H = new Vertice("Curitiba", new LinkedList(), 360, 350,null, 25.4290, 49.2671);
+  let I = new Vertice("Paranaguá", new LinkedList(), 420, 380,null, 25.5201, 48.5099);
+  let J = new Vertice("Guarapuva", new LinkedList(), 230, 350,null, 25.3907, 51.4628);
+  let K = new Vertice("São Mateus do Sul", new LinkedList(), 390, 420,null, 25.8682, 50.3842);
+  let L = new Vertice("Francisco Beltrão", new LinkedList(), 120, 440,null, 26.0779, 53.0520);
+  A.adicionarAresta(B, 143);
+  B.adicionarAresta(C, 50);
+  C.adicionarAresta(D, 126);
+  D.adicionarAresta(E, 190);
+  E.adicionarAresta(F, 114);
+  F.adicionarAresta(G, 273);
+  E.adicionarAresta(G, 314);
+  G.adicionarAresta(H, 114);
+  H.adicionarAresta(I, 90);
+  G.adicionarAresta(J, 165);
+  J.adicionarAresta(B, 250);
+  H.adicionarAresta(K, 157);
+  K.adicionarAresta(L, 354);
+  L.adicionarAresta(B, 186);
+  Grafo = [A, B, C, D, E, F, G, H, I, J, K, L];
+}
+returnMapa();
 
 const app = express();
 app.use(express.static("public"));
 //app.set("view engine", "ejs");
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
 
 app.get("/", (req, res) => {
   res.sendFile(path.resolve(path.resolve(app.get("views") + "/index.html")));
+});
+
+app.get("/mapa", (req, res) => {
+  returnMapa();
+  res.send("Success");
 });
 
 app.get("/api/get", (req, res) => {
@@ -79,7 +115,11 @@ app.get("/api/get", (req, res) => {
       return arrayTransformer(vertice);
     }),
     Grafo.map((vertice) => {
-      return { value: vertice.value, x: vertice.x, y: vertice.y };
+      return {
+        value: vertice.value,
+        x: vertice.x,
+        y: vertice.y
+      };
     }),
   ]);
 });
@@ -94,11 +134,23 @@ app.post("/api/insert", (req, res) => {
   const value = Number(req.body.value);
   const tipo = req.body.tipo;
   const valorado = req.body.valorado;
-  const originCord = {x:req.body.originX, y:req.body.originY};
-  const targetCord = {x:req.body.targetX, y:req.body.targetY};
+  const originCord = {
+    x: req.body.originX,
+    y: req.body.originY
+  };
+  const targetCord = {
+    x: req.body.targetX,
+    y: req.body.targetY
+  };
+  const latitude = req.body.latitude;
+  const longitude = req.body.longitude;
   // declara Vertices
   let Ve = originCord.x ? new Vertice(originName, new LinkedList(), Number(originCord.x), Number(originCord.y)) : new Vertice(originName, new LinkedList());
-  let Ve2 = targetCord.y ?  new Vertice(targetName, new LinkedList(), Number(targetCord.x), Number(targetCord.y)) : new Vertice(targetName, new LinkedList()) ;
+  if (latitude && longitude) {
+    Ve.latitude = latitude;
+    Ve.longitude = longitude;
+  }
+  let Ve2 = targetCord.y ? new Vertice(targetName, new LinkedList(), Number(targetCord.x), Number(targetCord.y)) : new Vertice(targetName, new LinkedList());
   if (Grafo) {
     //////////////////////////////////  Verifica se vertice já existe no array
     let VeP = Grafo.find((aresta) => aresta.value == Ve.value);
@@ -125,7 +177,6 @@ app.post("/api/insert", (req, res) => {
   }
   if (!usingOrigin && Ve.value != "") Grafo.push(Ve); ////  se não existe e não é vazio adiciona no array
   if (!usingTarget && Ve2.value != "") Grafo.push(Ve2);
-
   res.redirect("/");
 });
 
@@ -156,26 +207,58 @@ app.post("/api/remove", (req, res) => {
 
 app.post("/api/calcular", (req, res, next) => {
   let value = req.body.value;
+  let destino = req.body.destino;
   let algoritimo = req.body.algo;
   let node;
   if (value) node = Grafo.find((vertice) => vertice.value == value);
   else node = Grafo[0];
+  if(destino) {destino = Grafo.find((vertice) => vertice.value == destino);
+if(!destino) return res.status(400).send(new Error("Destino não encontrado"));
+  }
   if (!node) {
     console.log("Saida não encontrada");
     return res.status(400).send(new Error("Saida não encontrada"));
   }
+
   switch (algoritimo) {
     case "PRIM":
-      res.send({ data: PRIM(Grafo).map(vertice=>arrayTransformer(vertice)), algoritimo: algoritimo });
+      res.send({
+        data: PRIM(Grafo).map(vertice => arrayTransformer(vertice)),
+        algoritimo: algoritimo
+      });
       break;
     case "BFS":
-      res.send({ data: BFS(node).map(vertice=>arrayTransformer(vertice)), algoritimo: algoritimo });
+      res.send({
+        data: BFS(node).map(vertice => arrayTransformer(vertice)),
+        algoritimo: algoritimo
+      });
       break;
     case "DFS":
-      res.send({ data: DFS(node).map(vertice=>arrayTransformer(vertice)), algoritimo: algoritimo });
+      res.send({
+        data: DFS(node).map(vertice => arrayTransformer(vertice)),
+        algoritimo: algoritimo
+      });
       break;
     case "Roy":
-      res.send({ data: Roy(node, Grafo).map(solution=>{return "S: "+printGrafo(solution)}), algoritimo: algoritimo });
+      res.send({
+        data: Roy(node, Grafo).map(solution => {
+          return "S: " + printGrafo(solution)
+        }),
+        algoritimo: algoritimo
+      });
+      break;
+    case "Welsh Powell":
+      res.send({
+        data: WelshPowell(Grafo).map(vertice => arrayTransformer(vertice)),
+        algoritimo: algoritimo
+      });
+      break;
+    case "A*":
+    const {caminho, tabela} = shortestPath(Grafo, node, destino);
+      res.send({
+        data: {caminho: caminho.map(vertice => arrayTransformer(vertice)), tabela: tabela.map(vertice=> arrayTransformer(vertice))},
+        algoritimo: algoritimo
+      });
       break;
     default:
       res.send();

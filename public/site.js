@@ -29,7 +29,9 @@ function draw_line2(
   radius1,
   center2_x,
   center2_y,
-  radius2
+  radius2,
+  linkValue,
+  color
 ) {
   var betweenVec = new vec2(center2_x - center1_x, center2_y - center1_y);
   betweenVec.normalize();
@@ -40,9 +42,12 @@ function draw_line2(
   var p2x = center2_x - radius2 * betweenVec.x;
   var p2y = center2_y - radius2 * betweenVec.y;
 
+  if(color)ctx.strokeStyle = color;
   ctx.beginPath();
   canvas_arrow(ctx, p1x, p1y, p2x, p2y);
   ctx.stroke();
+  if(!color){ctx.font = "15px Arial";
+  ctx.strokeText(linkValue, p1x + (p2x -p1x)/2, p1y + (p2y - p1y)/2);}
 }
 
 function vec2(x, y) {
@@ -72,48 +77,31 @@ function getGrafo() {
   });
 }
 
-function desenhaGrafo(grafo, vertices){
+function desenhaGrafo(grafo, vertices) {
   var c = document.getElementById("grafo-canvas");
   var ctx = c.getContext("2d");
   ctx.clearRect(0, 0, c.width, c.height);
-
-  $("#grafo").text(
-    grafo.map((vertice) => {
-      return vertice.links.map((element) => {
-        draw_line2(
-          ctx,
-          vertice.x,
-          vertice.y,
-          radius,
-          element.x,
-          element.y,
-          radius
-        );
-        if (element.linkValue)
-          return (
-            " (" +
-            vertice.value +
-            element.value +
-            ")[" +
-            element.linkValue +
-            "]"
-          );
-        else return " (" + vertice.value + element.value + ")";
-      });
-    })
-  );
-  $("#vertices").text(
-    vertices.map((vertice) => {
-      ctx.beginPath();
-      ctx.arc(vertice.x, vertice.y, radius, 0, 2 * Math.PI);
-      ctx.fillStyle = "#03fce3";
-      ctx.fill();
-      ctx.stroke();
-      ctx.font = "15px Arial";
-      ctx.strokeText(vertice.value, vertice.x - 5, vertice.y + 5);
-      return vertice.value;
-    })
-  );
+  grafo.map((vertice) => {
+    ctx.beginPath();
+    ctx.arc(vertice.x, vertice.y, radius, 0, 2 * Math.PI);
+    ctx.fillStyle = "#03fce3";
+    ctx.fill();
+    ctx.stroke();
+    ctx.font = "15px Arial";
+    ctx.strokeText(vertice.value, vertice.x - 5, vertice.y + 5);
+    vertice.links.map((element) => {
+      draw_line2(
+        ctx,
+        vertice.x,
+        vertice.y,
+        radius,
+        element.x,
+        element.y,
+        radius,
+        element.linkValue
+      );
+    });
+  });
 }
 
 function insertVertice() {
@@ -123,9 +111,11 @@ function insertVertice() {
   data.value = document.getElementById("value").value;
   data.tipo = document.getElementById("tipo").checked;
   data.valorado = document.getElementById("type").checked;
+  data.latitude = document.getElementById("latValue").value;
+  data.longitude = document.getElementById("longValue").value;
   data.originX = originX;
   data.originY = originY;
-  data.targetX =  targetX;
+  data.targetX = targetX;
   data.targetY = targetY;
   $.ajax({
     type: "POST",
@@ -172,10 +162,24 @@ function reset() {
   });
 }
 
+function mapa() {
+  $.ajax({
+    type: "get",
+    url: "/mapa",
+    success: function() {
+      getGrafo();
+    },
+    error: function(err) {
+      console.log(err);
+    },
+  });
+}
+
 function calcular() {
   var data = {};
   data.algo = $("#algoritimo").prop("value");
   data.value = $("#algoritimo-input").prop("value");
+  data.destino = $("#algoritimo-destino").prop("value");
   $.ajax({
     type: "post",
     url: "/api/calcular",
@@ -184,9 +188,77 @@ function calcular() {
       var c = document.getElementById("algoritimo-canvas");
       var ctx = c.getContext("2d");
       ctx.clearRect(0, 0, c.width, c.height);
-      if (result.algoritimo != "Roy") {
+      if(result.algoritimo == "A*"){
+        console.log(result.data);
+        result.data.tabela.map((vertice) => {
+          ctx.beginPath();
+          ctx.arc(vertice.x, vertice.y, radius, 0, 2 * Math.PI);
+          if(!result.data.caminho.find((e)=>e.value===vertice.value) && vertice.value != result.data.caminho[0].parent.value)
+              ctx.fillStyle =  "#03fce3";
+          else ctx.fillStyle = "red";
+          ctx.fill();
+          ctx.stroke();
+          ctx.font = "15px Arial";
+          ctx.strokeText(vertice.value, vertice.x - 5, vertice.y + 5);
+          vertice.links.forEach((element) => {
+            ctx.stroke();
+            ctx.font = "15px Arial";
+            draw_line2(
+              ctx,
+              vertice.x,
+              vertice.y,
+              radius,
+              element.x,
+              element.y,
+              radius,
+              element.linkValue,
+            );
+          });
+        });
 
-
+        $("#pathfind").html(()=>{
+          return `<thead>
+            <tr>
+              <th scope="col">Nome</th>
+              <th scope="col">h(x)</th>
+            </tr>
+          </thead>
+          <tbody>
+          ${
+            result.data.tabela.map((vertice)=>{
+            return `<tr>
+              <th scope="row">${vertice.value}</th>
+              <td>${vertice.h}</td>
+            </tr>`
+            })}
+          </tbody>`
+        });
+      }
+      else if (result.algoritimo == "Welsh Powell") {
+        result.data.map((vertice) => {
+          ctx.beginPath();
+          ctx.arc(vertice.x, vertice.y, radius, 0, 2 * Math.PI);
+          ctx.fillStyle = vertice.color;
+          ctx.fill();
+          ctx.stroke();
+          ctx.font = "15px Arial";
+          ctx.strokeText(vertice.value, vertice.x - 5, vertice.y + 5);
+          vertice.links.forEach((element) => {
+            ctx.stroke();
+            ctx.font = "15px Arial";
+            draw_line2(
+              ctx,
+              vertice.x,
+              vertice.y,
+              radius,
+              element.x,
+              element.y,
+              radius,
+              element.linkValue
+            );
+          });
+        });
+      } else if (result.algoritimo != "Roy") {
         result.data[0].x = 250;
         result.data[0].y = 35;
         let fila = [];
@@ -256,10 +328,9 @@ window.addEventListener("DOMContentLoaded", function() {
   getGrafo();
   algoritimoChange();
   let canvasElem = document.getElementById("grafo-canvas");
-  canvasElem.addEventListener("mousedown", function(e)
-        {
-            selectArea  (canvasElem, e);
-        });
+  canvasElem.addEventListener("mousedown", function(e) {
+    selectArea(canvasElem, e);
+  });
 });
 
 $("#insert").on("click", function() {
@@ -291,15 +362,14 @@ function selectArea(canvas, event) {
   var ctx = canvas.getContext("2d");
   let x = event.clientX - rect.left;
   let y = event.clientY - rect.top;
-  if(originX == null || (originX != null && targetX != null)){
+  if (originX == null || (originX != null && targetX != null)) {
     var [grafo, vertice] = grafos;
     desenhaGrafo(grafo, vertice);
     originX = x;
     originY = y;
     targetX = targetY = null;
     ctx.fillStyle = "#ff0000";
-  }
-  else{
+  } else {
     targetX = x;
     targetY = y;
     ctx.fillStyle = "#0000ff";
