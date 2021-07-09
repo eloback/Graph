@@ -16,7 +16,8 @@ const {
   arrayTransformer,
   printGrafo,
   WelshPowell,
-  shortestPath
+  shortestPath,
+  savings,
 } = require("./list");
 
 /// Como Criar um Grafo
@@ -62,36 +63,90 @@ G.adicionarArco(H);
 H.adicionarArco(D);
 let Grafo = [A, B, C, D, E, F, G, H]; */
 /* var Grafo = []; */
+
 const returnMapa = () => {
-  let A = new Vertice("Foz do Iguaçu", new LinkedList(), 50, 400, null, 25.5163, 54.5854);
-  let B = new Vertice("Cascavel", new LinkedList(), 100, 340,null, 24.9578, 53.4595);
-  let C = new Vertice("Toledo", new LinkedList(), 80, 280,null, 24.7251, 53.7417);
-  let D = new Vertice("Umuarama", new LinkedList(), 140, 200,null, 23.7661, 53.3206);
-  let E = new Vertice("Maringa", new LinkedList(), 230, 170,null, 23.4210, 51.9331);
-  let F = new Vertice("Londrina", new LinkedList(), 300, 195,null, 23.3045, 51.1696);
-  let G = new Vertice("Ponta Grossa", new LinkedList(), 300, 320,null, 25.0994, 50.1583);
-  let H = new Vertice("Curitiba", new LinkedList(), 360, 350,null, 25.4290, 49.2671);
-  let I = new Vertice("Paranaguá", new LinkedList(), 420, 380,null, 25.5201, 48.5099);
-  let J = new Vertice("Guarapuva", new LinkedList(), 230, 350,null, 25.3907, 51.4628);
-  let K = new Vertice("São Mateus do Sul", new LinkedList(), 390, 420,null, 25.8682, 50.3842);
-  let L = new Vertice("Francisco Beltrão", new LinkedList(), 120, 440,null, 26.0779, 53.0520);
-  A.adicionarAresta(B, 143);
-  B.adicionarAresta(C, 50);
-  C.adicionarAresta(D, 126);
-  D.adicionarAresta(E, 190);
-  E.adicionarAresta(F, 114);
-  F.adicionarAresta(G, 273);
-  E.adicionarAresta(G, 314);
-  G.adicionarAresta(H, 114);
-  H.adicionarAresta(I, 90);
-  G.adicionarAresta(J, 165);
-  J.adicionarAresta(B, 250);
-  H.adicionarAresta(K, 157);
-  K.adicionarAresta(L, 354);
-  L.adicionarAresta(B, 186);
-  Grafo = [A, B, C, D, E, F, G, H, I, J, K, L];
+  Grafo = [];
+  // let A = new Vertice("Foz do Iguaçu", new LinkedList(), 50, 400, null, 25.5163, 54.5854);
+  // let B = new Vertice("Cascavel", new LinkedList(), 100, 340,null, 24.9578, 53.4595);
+  // let C = new Vertice("Toledo", new LinkedList(), 80, 280,null, 24.7251, 53.7417);
+  // let D = new Vertice("Umuarama", new LinkedList(), 140, 200,null, 23.7661, 53.3206);
+  // let E = new Vertice("Maringa", new LinkedList(), 230, 170,null, 23.4210, 51.9331);
+  // let F = new Vertice("Londrina", new LinkedList(), 300, 195,null, 23.3045, 51.1696);
+  // let G = new Vertice("Ponta Grossa", new LinkedList(), 300, 320,null, 25.0994, 50.1583);
+  // let H = new Vertice("Curitiba", new LinkedList(), 360, 350,null, 25.4290, 49.2671);
+  // let I = new Vertice("Paranaguá", new LinkedList(), 420, 380,null, 25.5201, 48.5099);
+  // let J = new Vertice("Guarapuva", new LinkedList(), 230, 350,null, 25.3907, 51.4628);
+  // let K = new Vertice("São Mateus do Sul", new LinkedList(), 390, 420,null, 25.8682, 50.3842);
+  // let L = new Vertice("Francisco Beltrão", new LinkedList(), 120, 440,null, 26.0779, 53.0520);
+  // A.adicionarAresta(B, 143);
+  // B.adicionarAresta(C, 50);
+  // C.adicionarAresta(D, 126);
+  // D.adicionarAresta(E, 190);
+  // E.adicionarAresta(F, 114);
+  // F.adicionarAresta(G, 273);
+  // E.adicionarAresta(G, 314);
+  // G.adicionarAresta(H, 114);
+  // H.adicionarAresta(I, 90);
+  // G.adicionarAresta(J, 165);
+  // J.adicionarAresta(B, 250);
+  // H.adicionarAresta(K, 157);
+  // K.adicionarAresta(L, 354);
+  // L.adicionarAresta(B, 186);
+  // Grafo = [A, B, C, D, E, F, G, H, I, J, K, L];
+  Grafo.push(new Vertice("A"/*0*/, new LinkedList(), 40, 150));
+  Grafo.push(new Vertice("B"/*1*/, new LinkedList(), 250, 90));
+  Grafo.push(new Vertice("C"/*2*/, new LinkedList(), 470, 150));
+  Grafo.push(new Vertice("D"/*3*/, new LinkedList(), 400, 340));
+  Grafo.push(new Vertice("E"/*4*/, new LinkedList(), 150, 340));
+  Grafo.push(new Vertice("O"/*5*/, new LinkedList(), 250, 200));
+  Grafo[0].adicionarAresta(Grafo[1], 10);
+  Grafo[0].adicionarAresta(Grafo[2], 12);
+  Grafo[0].adicionarAresta(Grafo[3], 18);
+  Grafo[0].adicionarAresta(Grafo[4], 10);
+  Grafo[0].adicionarAresta(Grafo[5], 10);
+  Grafo[1].adicionarAresta(Grafo[2], 7);
+  Grafo[1].adicionarAresta(Grafo[3], 12);
+  Grafo[1].adicionarAresta(Grafo[4], 12);
+  Grafo[1].adicionarAresta(Grafo[5], 5);
+  Grafo[2].adicionarAresta(Grafo[3], 8);
+  Grafo[2].adicionarAresta(Grafo[4], 12);
+  Grafo[2].adicionarAresta(Grafo[5], 5);
+  Grafo[3].adicionarAresta(Grafo[4], 10);
+  Grafo[3].adicionarAresta(Grafo[5], 10);
+  Grafo[4].adicionarAresta(Grafo[5], 10);
+  
 }
-returnMapa();
+
+
+const saveTest = ()=>{
+  Grafo = [];
+  Grafo.push(new Vertice("1"/*0*/, new LinkedList(), 150, 90));
+  Grafo.push(new Vertice("2"/*1*/, new LinkedList(), 300, 90));
+  Grafo.push(new Vertice("3"/*2*/, new LinkedList(), 400, 210));
+  Grafo.push(new Vertice("4"/*3*/, new LinkedList(), 300, 340));
+  Grafo.push(new Vertice("5"/*4*/, new LinkedList(), 150, 340));
+  Grafo.push(new Vertice("6"/*5*/, new LinkedList(), 100, 210));
+  Grafo[0].adicionarAresta(Grafo[1], 3);
+  Grafo[0].adicionarAresta(Grafo[2], 2);
+  Grafo[0].adicionarAresta(Grafo[3], 5);
+  Grafo[0].adicionarAresta(Grafo[4], 10);
+  Grafo[0].adicionarAresta(Grafo[5], 2);
+  Grafo[1].adicionarAresta(Grafo[2], 7);
+  Grafo[1].adicionarAresta(Grafo[3], 11);
+  Grafo[1].adicionarAresta(Grafo[4], 8);
+  Grafo[1].adicionarAresta(Grafo[5], 1);
+  Grafo[2].adicionarAresta(Grafo[3], 2);
+  Grafo[2].adicionarAresta(Grafo[4], 9);
+  Grafo[2].adicionarAresta(Grafo[5], 9);
+  Grafo[3].adicionarAresta(Grafo[4], 3);
+  Grafo[3].adicionarAresta(Grafo[5], 2);
+  Grafo[4].adicionarAresta(Grafo[5], 4);
+}
+
+/// Alteração de Grafos pre montados:
+// returnMapa();
+saveTest();
+
 
 const app = express();
 app.use(express.static("public"));
@@ -194,7 +249,7 @@ app.post("/api/remove", (req, res) => {
   } else {
     let Ve2 = Grafo.find((aresta) => aresta.value == targetName);
     if (Ve2) {
-      if (tipo) {
+      if (tipo == "true") { // true == arco
         Ve.links.delete(Ve2.value);
       } else {
         Ve.links.delete(Ve2.value);
@@ -248,6 +303,7 @@ if(!destino) return res.status(400).send(new Error("Destino não encontrado"));
       });
       break;
     case "Welsh Powell":
+      console.log(WelshPowell(Grafo).map(vertice => arrayTransformer(vertice)));
       res.send({
         data: WelshPowell(Grafo).map(vertice => arrayTransformer(vertice)),
         algoritimo: algoritimo
@@ -260,7 +316,15 @@ if(!destino) return res.status(400).send(new Error("Destino não encontrado"));
         algoritimo: algoritimo
       });
       break;
+    case "Savings":
+      const grafo = savings(Grafo, Object.assign({}, node)).map(vertice => arrayTransformer(vertice));
+      res.send({
+        data: grafo,
+        algoritimo: algoritimo
+      });
+      break;
     default:
+      console.log(algoritimo);
       res.send();
   }
 });

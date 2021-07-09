@@ -98,7 +98,7 @@ class LinkedList {
     else this.head = new ListNode(vertice, value);
   }
 
-  searchNode(value) {
+  searchNode(value) { // searc for exact node
     let node = this.head;
     while (node) {
       if (value === node.data) return node;
@@ -106,10 +106,18 @@ class LinkedList {
     }
     return false;
   }
-  searchVertice(value) { /// Search in links
+  searchVertice(value) { /// Search in links //search by value
     let node = this.head;
     while (node) {
       if (value === node.data.value) return node.data;
+      node = node.next;
+    }
+    return false;
+  }
+  searchLink(value) {
+    let node = this.head;
+    while (node) {
+      if (value === node.data) return node;
       node = node.next;
     }
     return false;
@@ -550,6 +558,96 @@ function shortestPath(Grafo, start, target) {
   }
 }
 
+function first_last(x, caminho){
+  if(caminho){
+     if(caminho[0] === x) return "start" 
+     else if(caminho[caminho.length-1] === x) return "end"
+  }
+  return false
+}
+
+function savings(Grafo, k){ // k = vertice inicial
+  let saves = [];
+  const grafo = Grafo;
+  k = grafo.find(vertice=>vertice.value == k.value);
+  k.links.percorre((kj)=>{ //ligação entre vertices k e j
+    const j = kj.data;
+
+    j.links.percorre((ji)=>{ // ...
+      const i = ji.data;
+      const ki = k.links.searchLink(i); //procura ligação ki. usando a data de ji que é igual a i.
+      const linkName = j.value+i.value;
+      if(!saves.find((save)=>save.j.value+save.i.value === linkName || save.i.value+save.j.value == linkName)){
+       if(ki) {
+         saves.push({
+            'save': kj.linkValue + ki.linkValue - (ji.linkValue),
+            'j': j,
+            'i': i,
+            'linkValue': ji.linkValue
+          }); 
+        }
+      }
+    });
+
+    /// REMOVE todas as ligações dos J
+    const linkValue = kj.linkValue;
+    j.links = new LinkedList();
+    j.adicionarArco(k, linkValue);
+  });
+  saves.sort((A, B)=>{
+    if(A.save < B.save){
+      return 1;
+    }
+    if(A.save > B.save){
+      return -1;
+    }
+  });
+
+  //STEP 3
+  var caminhos = []
+  for(save of saves){
+    const i = save.i;
+    const j = save.j;
+    const caminhoI = caminhos.filter(caminho=>caminho.includes(i))[0]; // Caminho que contem I
+    const caminhoJ = caminhos.filter(caminho=>caminho.includes(j))[0]; // Caminho que contem J
+    var direcao = 0; // Direção da ligação
+
+    if(!caminhoI?.length>0 && !caminhoJ?.length>0){
+      caminhos.push([i, j]);
+      i.adicionarArco(j, save.linkValue);
+      i.links.delete(k.value);
+      k.links.delete(j.value);
+    }
+    else if(caminhoJ && !caminhoI && first_last(j, caminhoJ)){ // I entrando no J
+      if(first_last(j, caminhoJ) == "end") direcao = 1;
+      caminhoJ.splice(caminhoJ.indexOf(j)+direcao, 0, i);
+      if(!direcao){
+        i.adicionarArco(j, save.linkValue);
+        i.links.delete(k.value);
+        k.links.delete(j.value);
+      }else{
+        j.adicionarArco(i, save.linkValue);
+        j.links.delete(k.value);
+        k.links.delete(i.value);
+      }
+    }
+    else if(caminhoI && !caminhoJ && first_last(i, caminhoI)){ //J entrando no I
+      if(first_last(i, caminhoI) == "end") direcao = 1;
+      caminhoI.splice(caminhoI.indexOf(i)+direcao, 0, j);
+      if(direcao){
+        i.adicionarArco(j, save.linkValue);
+        i.links.delete(k.value);
+        k.links.delete(j.value);
+      }else{
+        j.adicionarArco(i, save.linkValue);
+        j.links.delete(k.value);
+        k.links.delete(i.value);
+      }
+    }
+  }
+  return grafo;
+}
+
 
 module.exports = {
   ListNode,
@@ -563,5 +661,6 @@ module.exports = {
   arrayTransformer,
   printGrafo,
   WelshPowell,
-  shortestPath
+  shortestPath,
+  savings
 };

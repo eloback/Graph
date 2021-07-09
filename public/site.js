@@ -72,13 +72,13 @@ function getGrafo() {
     success: function(result) {
       const [grafo, vertices] = result;
       grafos = result;
-      desenhaGrafo(grafo, vertices);
+      desenhaGrafo(grafo);
     },
   });
 }
 
-function desenhaGrafo(grafo, vertices) {
-  var c = document.getElementById("grafo-canvas");
+function desenhaGrafo(grafo, c = desenhaGrafo(grafo, document.getElementById("grafo-canvas"))) {
+  
   var ctx = c.getContext("2d");
   ctx.clearRect(0, 0, c.width, c.height);
   grafo.map((vertice) => {
@@ -188,7 +188,12 @@ function calcular() {
       var c = document.getElementById("algoritimo-canvas");
       var ctx = c.getContext("2d");
       ctx.clearRect(0, 0, c.width, c.height);
-      if(result.algoritimo == "A*"){
+      console.log(result.algoritimo);
+      console.log(result.data);
+      if(result.algoritimo == "Savings"){
+        desenhaGrafo(result.data);
+      } 
+      else if(result.algoritimo == "A*"){
         console.log(result.data);
         result.data.tabela.map((vertice) => {
           ctx.beginPath();
@@ -287,7 +292,8 @@ function calcular() {
           ctx.strokeText(vertice.value, vertice.x - 5, vertice.y + 5);
           vertice = fila.shift();
         }
-      } else {
+      }
+      else {
         ctx.font = "15px Arial";
         console.log(result.data);
         result.data.forEach((grafo) => {
@@ -364,7 +370,7 @@ function selectArea(canvas, event) {
   let y = event.clientY - rect.top;
   if (originX == null || (originX != null && targetX != null)) {
     var [grafo, vertice] = grafos;
-    desenhaGrafo(grafo, vertice);
+    desenhaGrafo(grafo, canvas);
     originX = x;
     originY = y;
     targetX = targetY = null;
